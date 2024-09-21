@@ -9,7 +9,9 @@
     @swiper="onSwiper"
     >
     <swiper-slide v-for="slide in slides" :key="slide">
-        <router-link :to="'/products/'+slide.link"><img :src="'/images/'+slide.image" :class="slideClasee" /></router-link>
+        <router-link :to="'/products/'+slide.link">
+            <img :src="'/images/'+slide.image" :class="slideClasee" />
+        </router-link>
     </swiper-slide>
 </swiper>
 </template>

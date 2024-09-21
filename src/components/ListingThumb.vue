@@ -2,7 +2,12 @@
     <div class="q-grid parent">
         <div v-if="showImage !== false" class="q-cell-1">
             <router-link :to="'/products/' + listing.title">
-                <img class="cover-photo" loading="lazy" :src="imagePath()" :alt="mainProduct.name">
+                <v-lazy-image 
+                    :src="imagePath()"
+                    :src-placeholder="imagePlaceholder()"
+                    alt="Planter Hanger"
+                />
+                <!-- <img class="cover-photo" loading="lazy" :src="imagePath()" :alt="mainProduct.name"> -->
             </router-link>
         </div>
         <div class="q-cell-1 details">
@@ -20,9 +25,10 @@
     
     <script setup>
     import { computed } from 'vue';
+    import VLazyImage from "v-lazy-image";
     import useListings from '../composables/useListings';
 
-    const { getMainProduct, getListingCoverPhoto } = useListings();
+    const { getMainProduct, getListingCoverPhoto, getListingCoverPlaceholder } = useListings();
 
     const props = defineProps({
         listing: Object,
@@ -36,6 +42,10 @@
     
     function imagePath() {
         return getListingCoverPhoto(props.listing);
+    }
+
+    function imagePlaceholder() {
+        return getListingCoverPlaceholder(props.listing);
     }
     
     </script>

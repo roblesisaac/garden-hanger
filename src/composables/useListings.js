@@ -36,6 +36,16 @@ export default function useListings() {
         return `/images/${imageName}.webp`;
     }
 
+    function getListingCoverPlaceholder(listing) {
+        if(listing.coverPhoto) {
+            return listing.coverPhoto;
+        }
+        const mainProduct = getMainProduct(listing);
+        const imageName = mainProduct.images[0];
+
+        return `/image/80/${imageName}.webp`;
+    }
+
     function getMainSku(listing) {
         return listing?.productsInListing?.[0]?.sku; 
     }
@@ -63,6 +73,7 @@ export default function useListings() {
         calcListingValue,
         getListing,
         getListingCoverPhoto,
+        getListingCoverPlaceholder,
         getMainSku,
         getMainProduct,
         getProductLineData,

@@ -14,6 +14,7 @@ import shippingRouter from './routes/shippingRouter';
 import dbRouter from './routes/dbRouter';
 import orderRouter from './routes/orderRouter';
 import stripeRouter from './routes/stripeRouter';
+import sharpRouter from './routes/sharpRouter';
 
 const app = express();
 
@@ -30,11 +31,14 @@ app.use('/api/stripe', stripeRouter);
 
 const api = Router();
 
+app.use('/', sharpRouter);
+
 app.use('/api', api);
 
 api.use(express.json());
     
 api.get('/', (_, res) => res.json({ message: '<(-_-)> Running, the API is.' }));
+
 api.use('/', authRouter);
 api.use('/', contactRouter);
 api.use('/', cartRouter);

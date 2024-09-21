@@ -38,7 +38,18 @@
         :key="img"
         class="aspect-[1/1]"
     >
-        <img
+        <v-lazy-image 
+            :src="imagePath(index)"
+            :src-placeholder="imagePlaceholder(index)"
+            alt="Planter Hanger"
+            :class="[
+            'w-full h-full object-cover rounded cursor-pointer transition-all duration-300',
+            isActiveThumb(index) ? 'ring-2 ring-blue-500' : 'hover:opacity-75'
+            ]"
+            @click="activateImage(index)"
+        />
+
+        <!-- <img
         :src="imagePath(index)"
         :alt="mainSku"
         :class="[
@@ -46,7 +57,7 @@
             isActiveThumb(index) ? 'ring-2 ring-blue-500' : 'hover:opacity-75'
         ]"
         @click="activateImage(index)"
-        />
+        /> -->
     </div>
     </div>
 </div>
@@ -57,7 +68,8 @@
   import { Swiper, SwiperSlide } from 'swiper/vue';
   import { formatAsPrice } from '../utils/formats';
   import useListings from '../composables/useListings';
-  
+  import VLazyImage from "v-lazy-image";
+
   const props = defineProps({
     listing: Object,
   });
@@ -73,6 +85,11 @@
   function imagePath(index = 0) {
     const imageName = mainProduct.value.images[index];
     return `/images/${imageName}.webp`;
+  }
+
+  function imagePlaceholder(index = 0) {
+    const imageName = mainProduct.value.images[index];
+    return `/image/5/${imageName}.webp`;
   }
   
   function activateImage(index) {

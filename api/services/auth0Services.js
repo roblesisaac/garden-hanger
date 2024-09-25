@@ -1,8 +1,8 @@
 import { auth } from 'express-oauth2-jwt-bearer';
 
 const checkJwt = auth({
-    audience: 'my-audience',
-    issuerBaseURL: 'base-url',
+    audience: 'audience',
+    issuerBaseURL: 'url',
     tokenSigningAlg: 'RS256'
 });
 

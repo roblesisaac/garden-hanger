@@ -20,7 +20,7 @@
   </template>
   
   <script setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useAuth0 } from '@auth0/auth0-vue';
   import useApi from './composables/useApi';
 
@@ -75,10 +75,10 @@
           await listingsDb.init();
           await cartStore.init();
           await boxes.init();
-
-          await test();
       } catch (err) {
           console.error(err);
       }
   });
+
+  watch(isAuthenticated, test);
   </script>

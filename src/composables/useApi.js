@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { load } from 'recaptcha-v3';
-import { useAuth0 } from '@auth0/auth0-vue';
+import { auth0 } from '../auth0';
 let public_recaptcha = null;
 const notifications = ref([]);
 
@@ -45,7 +45,8 @@ export default function useApi() {
   async function request(method, url, body = null, settings = {}) {
     loading.value = true;
 
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently } = auth0;
+    console.log('type:', typeof getAccessTokenSilently);
     const auth0Token = await getAccessTokenSilently();
 
     try {

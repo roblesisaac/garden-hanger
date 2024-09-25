@@ -17,19 +17,24 @@ const head = createHead()
 const pinia = createPinia();
 const app = createApp(App)
 
-console.log(window.location.origin);
+const auth0Domain = 'my-domain';
 
-app.use(
-    createAuth0({
-        domain: 'my-domain',
-        clientId: 'my-client-id',
-        authorizationParams: {
-          redirect_uri: window.location.origin
-        }
-      })
-    )
+const auth0 = createAuth0({
+  domain: auth0Domain,
+  clientId: 'my-id',
+  authorizationParams: {
+    redirect_uri: window.location.origin,
+    // audience: `${auth0Domain}/api/v2/`,
+    scope: 'openid profile email offline_access'
+  },
+  cacheLocation: 'memory',
+  useRefreshTokens: true,
+  httpTimeoutInSeconds: 60
+});
+
+app.use(auth0)
     .use(head)
     .use(pinia)
-    .use(router);
+    .use(router)
 
 app.mount('#app')

@@ -7,7 +7,7 @@ export const auth0 = createAuth0({
     clientId: 'client-id',
     authorizationParams: {
       redirect_uri: window.location.origin,
-      audience: `${auth0Domain}/api/v2/`,
+      audience: `my-url/api/auth0/test`,
       scope: 'openid profile email offline_access'
     },
     cacheLocation: 'memory',

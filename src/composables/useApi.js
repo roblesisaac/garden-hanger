@@ -46,7 +46,6 @@ export default function useApi() {
     loading.value = true;
 
     const { getAccessTokenSilently } = auth0;
-    console.log('type:', typeof getAccessTokenSilently);
     const auth0Token = await getAccessTokenSilently();
 
     try {

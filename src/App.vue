@@ -29,10 +29,7 @@
 
   async function test() {
     if(isAuthenticated.value) {
-    console.log('is auth!', {
-      isAuthenticated: isAuthenticated.value,
-      type: typeof isAuthenticated
-    });
+    console.log('is auth!');
     try {
       const result = await get('auth0/profile');
       console.log({ 

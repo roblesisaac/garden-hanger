@@ -1,16 +1,16 @@
 import { createAuth0 } from '@auth0/auth0-vue';
 
-const auth0Domain = 'my-domain';
+const auth0Domain = '...';
 
 export const auth0 = createAuth0({
     domain: auth0Domain,
-    clientId: 'client-id',
+    clientId: '...',
     authorizationParams: {
       redirect_uri: window.location.origin,
-      audience: `my-url/api/auth0/test`,
-      scope: 'openid profile email offline_access'
+      audience: `...`,
+      // scope: 'openid profile email offline_access'
     },
-    cacheLocation: 'memory',
-    useRefreshTokens: true,
-    httpTimeoutInSeconds: 60
+    // cacheLocation: 'localstorage',
+    // useRefreshTokens: true,
+    // httpTimeoutInSeconds: 60
 });

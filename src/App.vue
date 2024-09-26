@@ -25,15 +25,16 @@
   import useApi from './composables/useApi';
 
   const { get } = useApi();
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, user } = useAuth0();
 
   async function test() {
     if(isAuthenticated.value) {
     console.log('is auth!');
     try {
-      const result = await get('auth0/profile');
+      const result = await get('auth0/test');
       console.log({ 
-        result
+        result,
+        user
       })
     } catch (err) {
       console.log('err', err);
@@ -67,7 +68,7 @@
   
   onMounted(async () => {
       try {
-          await userStore.checkAuth();
+          // await userStore.checkAuth();
           await productsDb.init();
           await listingsDb.init();
           await cartStore.init();

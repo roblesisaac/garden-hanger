@@ -14,6 +14,13 @@ export default function useApi() {
     body.recaptchaToken = await recaptcha.execute(settings.action || 'submit');
   }
 
+  async function getAuth0Token() {
+    const { getAccessTokenSilently, isAuthenticated } = auth0;
+    return isAuthenticated.value
+      ? await getAccessTokenSilently()
+      : null;
+  }
+
   async function retrievePublicRecaptcha() {
     if (public_recaptcha) return;
     
@@ -45,8 +52,7 @@ export default function useApi() {
   async function request(method, url, body = null, settings = {}) {
     loading.value = true;
 
-    const { getAccessTokenSilently } = auth0;
-    const auth0Token = await getAccessTokenSilently();
+    const auth0Token = await getAuth0Token();
 
     try {
       if (settings.checkIfHuman) {
@@ -59,14 +65,19 @@ export default function useApi() {
         url = url.slice(1);
       }
 
+      const headers = {
+        'Content-Type': 'application/json',
+        ...settings.headers
+      };
+
+      if (auth0Token) {
+        headers.Authorization = `Bearer ${auth0Token}`;
+      }
+
       const response = await fetch(baseUrl + url, { 
         method,
         body: body ? JSON.stringify(body) : null,
-        headers: {
-          Authorization: auth0Token ? `Bearer ${auth0Token}` : undefined,
-          'Content-Type': 'application/json',
-          ...settings.headers
-        }
+        headers
       });
 
       if (!response.ok) {

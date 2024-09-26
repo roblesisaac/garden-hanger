@@ -15,14 +15,8 @@ const Privacy = () => import('./pages/Privacy.vue');
 const Terms = () => import('./pages/Terms.vue');
 const ThankYou = () => import('./pages/ThankYou.vue');
 const Boxes = () => import('./pages/BoxesPage.vue');
-const Auth0 = () => import('./pages/Auth0.vue');
 
 const routes = [
-  {
-    path: '/auth0',
-    name: 'Auth0',
-    component: Auth0
-  },
   { 
     path: '/',
     name: 'Home',

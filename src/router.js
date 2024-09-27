@@ -15,6 +15,7 @@ const Privacy = () => import('./pages/Privacy.vue');
 const Terms = () => import('./pages/Terms.vue');
 const ThankYou = () => import('./pages/ThankYou.vue');
 const Boxes = () => import('./pages/BoxesPage.vue');
+const Auth0 = () => import('./pages/Auth0.vue');
 
 const routes = [
   { 
@@ -35,7 +36,8 @@ const routes = [
   {
     path: '/products',
     name: 'Products',
-    component: Listings },
+    component: Listings 
+  },
   {
     path: '/products/:title',
     name: 'Product',
@@ -84,7 +86,14 @@ const routes = [
     path: '/thank-you',
     name: 'thank you',
     component: ThankYou,
-    meta: { hide: true } }
+    meta: { hide: true } 
+  },
+  {
+    path: '/auth0',
+    name: 'auth0',
+    component: Auth0,
+    meta: { hide: true } 
+  }
 ];
 
 const router = createRouter({

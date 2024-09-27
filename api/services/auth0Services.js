@@ -1,8 +1,11 @@
 import { auth } from 'express-oauth2-jwt-bearer';
+import config from '../config/environment';
+
+const { AUTH0_ISSUER_BASE_URL, AUTH0_AUDIENCE } = config;
 
 const checkJwt = auth({
-    audience: 'https://url/api/auth0/test',
-    issuerBaseURL: 'https://url.com/',
+    audience: AUTH0_AUDIENCE,
+    issuerBaseURL: AUTH0_ISSUER_BASE_URL,
     tokenSigningAlg: 'RS256'
 });
 

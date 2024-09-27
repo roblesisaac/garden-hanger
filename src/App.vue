@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 
 // Components
 import TopNav from './components/TopNav.vue';
@@ -43,7 +43,7 @@ const State = ref({
 
 onMounted(async () => {
     try {
-        // await userStore.checkAuth();
+        await userStore.checkAuth();
         await productsDb.init();
         await listingsDb.init();
         await cartStore.init();

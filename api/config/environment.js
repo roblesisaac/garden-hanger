@@ -68,5 +68,7 @@ export default {
         PUBLIC_TEST: params('STRIPE_PUBLIC_TEST'),
         // WHSEC_TEST: params('STRIPE_WHSEC_TEST') // webhook key
     },
+    AUTH0_AUDIENCE: params('AUTH0_AUDIENCE'),
+    AUTH0_ISSUER_BASE_URL: params('AUTH0_ISSUER_BASE_URL'),
     URL: `https://${customDomain}`
 };

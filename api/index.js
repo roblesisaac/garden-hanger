@@ -1,6 +1,5 @@
 import express from 'express';
 import { Router } from 'express';
-import cors from 'cors';
 
 // Middlewares
 import sessionStore from './middlewares/sessionStore';
@@ -20,15 +19,9 @@ import auth0Router from './routes/auth0Router';
 
 const app = express();
 
-app.use(cors())
-    // .use(sessionStore())
-    // .use(passport.initialize())
-    // .use(passport.session());
-
-// app.use((req, res, next) => {
-//     console.log(req.session);
-//     next();
-// })
+app.use(sessionStore())
+    .use(passport.initialize())
+    .use(passport.session());
 
 app.use('/api/stripe', stripeRouter);
 

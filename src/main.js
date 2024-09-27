@@ -22,6 +22,4 @@ app.use(auth0)
     .use(pinia)
     .use(router)
 
-app.provide('auth0', app.config.globalProperties.$auth0);
-
 app.mount('#app')

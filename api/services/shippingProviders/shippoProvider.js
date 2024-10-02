@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../../config/environment';
+import isProd from '../../utils/isProd';
 
 const API_BASE_URL = 'https://api.goshippo.com';
 
@@ -159,8 +160,10 @@ function formatShipmentParcels(shipment) {
 }
 
 function getHeaders() {
+    const authToken = isProd() ? config.SHIP.SHIPPO_PROD : config.SHIP.SHIPPO_TEST;
+
     return {
         'Content-Type': 'application/json',
-        'Authorization': `ShippoToken ${config.SHIP.SHIPPO_PROD}`
+        'Authorization': `ShippoToken ${authToken}`
     };
 }

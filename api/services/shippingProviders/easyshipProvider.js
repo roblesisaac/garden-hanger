@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../../config/environment';
+import isProd from '../../utils/isProd';
 
 const API_BASE_URL = 'https://api.easyship.com/2023-01';
 
@@ -139,8 +140,10 @@ function formatItems(items) {
 }
 
 function getHeaders() {
+    const authToken = isProd() ? config.SHIP.EASYSHIP_PROD : config.SHIP.EASYSHIP_SAND;
+
     return {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.SHIP.EASYSHIP_PROD}`
+        'Authorization': `Bearer ${authToken}`
     };
 }

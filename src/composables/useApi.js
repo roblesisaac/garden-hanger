@@ -96,26 +96,33 @@ export default function useApi() {
     }
   }
 
+  function notify(messages, { sustain } = {}) {
+    // Convert single message to array if necessary
+    const messageArray = Array.isArray(messages) ? messages : [messages];
+    
+    messageArray.forEach(message => {
+      const messageText = message.message || message;
+      const messageType = message.type || 'ERROR';
+      const messageId = Math.random().toString();
       
-  function notify(message) {
-    const messageText = message.message || message;
-    const messageType = message.type || 'ERROR'; 
-    const duplicateMessage = notifications.value.find(m => m.message === messageText);
-    const messageId = Math.random().toString();
-    
-    if(duplicateMessage) {
-      duplicateMessage.messageId = messageId;
-    } else {
-      notifications.value.push({
-        messageId,
-        message: messageText,
-        type: messageType
-      });
-    }
-    
-    setTimeout(() => {
-      removeNotification(messageId);
-    }, 10*1000);
+      const duplicateMessage = notifications.value.find(m => m.message === messageText);
+      
+      if (duplicateMessage) {
+        duplicateMessage.messageId = messageId;
+      } else {
+        notifications.value.push({
+          messageId,
+          message: messageText,
+          type: messageType
+        });
+      }
+      
+      if (!sustain) {
+        setTimeout(() => {
+          removeNotification(messageId);
+        }, 10*1000);
+      }
+    });
   }
   
   function removeNotification(messageId) {

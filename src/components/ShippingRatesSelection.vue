@@ -8,7 +8,7 @@
           <input 
             type="radio" 
             :name="'shipping-rate'" 
-            @change="selectRate(rate._id)" 
+            @change="selectRate(rate)" 
             :value="rate._id" 
             v-model="selectedRateId"
             class="form-radio h-5 w-5 text-blue-600"
@@ -73,8 +73,13 @@ function getImageLogo(rate) {
   return 'cards/visa.png';
 }
 
-function selectRate(rateId) {
-  selectedRateId.value = rateId;
+function selectRate(rate) {
+  console.log({
+    rate,
+    shipmentRatesData: props.shipmentRatesData,
+    selectedServiceProvider: props.selectedServiceProvider
+  });
+  selectedRateId.value = rate._id;
 }
 
 async function handlePurchaseLabel(rateId) {

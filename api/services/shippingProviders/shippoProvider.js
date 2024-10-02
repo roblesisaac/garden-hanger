@@ -161,6 +161,6 @@ function formatShipmentParcels(shipment) {
 function getHeaders() {
     return {
         'Content-Type': 'application/json',
-        'Authorization': `ShippoToken ${config.SHIP.SHIPPO_TEST}`
+        'Authorization': `ShippoToken ${config.SHIP.SHIPPO_PROD}`
     };
 }

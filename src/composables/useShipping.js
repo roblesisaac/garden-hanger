@@ -174,7 +174,6 @@ export default function useShipping() {
 
     async function getShippingOptions(items) {
         items = items || useCartStore().items;
-        
 
         const itemsInShipment = formatItemsForShipmentCreation(items);
         const { dimensions, totalWeight, units } = calculateBoxDimensions(itemsInShipment);
@@ -183,7 +182,7 @@ export default function useShipping() {
 
         const idealBox = findIdealBox(dimensions, boxesDb.items);
         const { packedBoxes, totalWeightOfAllBoxes } = packItemsIntoBoxes(units, boxesDb.items);
-        const totalWeightCalc = Number(totalWeight + calculatePackagingWeight(units.length)).toFixed(2);
+        const totalWeightCalc = Number(totalWeight + calculatePackagingWeight(units.length))
 
         const shippingOptions = {
             idealOption: {
@@ -196,7 +195,7 @@ export default function useShipping() {
             },
             availableOption: {
                 boxes: packedBoxes,
-                totalWeight: Number(totalWeightOfAllBoxes).toFixed(2)
+                totalWeight: Number(totalWeightOfAllBoxes || 0)
             }
         };
 

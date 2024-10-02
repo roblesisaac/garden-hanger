@@ -23,6 +23,8 @@ h1 {
 }
 .parent {
     padding: 50px 0;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 .product-line {
     padding: 30px 0;

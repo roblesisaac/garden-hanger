@@ -16,6 +16,7 @@ const Terms = () => import('./pages/Terms.vue');
 const ThankYou = () => import('./pages/ThankYou.vue');
 const Boxes = () => import('./pages/BoxesPage.vue');
 const Auth0 = () => import('./pages/Auth0.vue');
+const CustomBracketBuilder = () => import('./pages/CustomBracketPage.vue');
 
 const routes = [
   { 
@@ -93,6 +94,12 @@ const routes = [
     name: 'auth0',
     component: Auth0,
     meta: { hide: true } 
+  },
+  {
+    path: '/custom-bracket-builder',
+    name: 'Custom Bracket Builder',
+    component: CustomBracketBuilder,
+    // meta: { hide: true }  
   }
 ];
 

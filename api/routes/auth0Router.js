@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import auth0Controllers from '../controllers/auth0Controllers.js';
-import { checkJwt } from '../services/auth0Services.js';
+import auth0Controllers from '../controllers/auth0Controllers';
+import { checkJwt } from '../services/auth0Services';
 
 const router = Router();
 

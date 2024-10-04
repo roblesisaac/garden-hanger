@@ -1,4 +1,4 @@
-import AmptModel from 'ampt-model';
+import AmptModel from '../utils/amptModel';
 
 const Cart = AmptModel(['cart', 'userid'], {
     userid: String,

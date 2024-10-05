@@ -5,5 +5,14 @@
     "zenMode.hideLineNumbers": true,
     "notebook.lineNumbers": "off",
     "IDX.aI.enableInlineCompletion": true,
-    "zenMode.showTabs": "single"
+    "zenMode.showTabs": "single",
+    "css.validate": false,
+    "tailwindCSS.emmetCompletions": true,
+    "tailwindCSS.includeLanguages": {
+      "vue": "html",
+      "vue-html": "html"
+    },
+    "editor.quickSuggestions": {
+      "strings": true
+    }
 }

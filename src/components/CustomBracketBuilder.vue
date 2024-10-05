@@ -89,6 +89,15 @@
                 </div>
               </div>
             </div>
+
+            <div class="absolute" :style="{ bottom: `${bracketBottom}px`, left: `${sideDStartLeft}px` }">
+              <div class="relative">
+                <div :style="`display: block; background: #f2e8e5; height: ${sideCHeight - blockSize}px; width: ${sideDWidth}px;`">
+                  <b class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-90">WALL</b>
+                </div>
+              </div>
+
+            </div>
             
             <!-- Side E - Vertical, top right -->
             <div class="absolute" :style="{ bottom: `${sideEBottom}px`, left: `${sideELeft}px` }">

@@ -28,11 +28,10 @@
                       height: block === 1 ? `${blockSize}px` : `${block * blockSize}px`
                     }"
                   ></div>
-                  <span class="absolute -left-16 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-600 text-center">
-                    Side A 
-                    <br/>
+                  <div class="absolute -left-20 top-1/2 transform -translate-y-1/2 flex flex-col items-end">
+                    <span class="text-sm font-medium text-gray-600">Side A</span>
                     <span class="text-indigo-600 font-bold">{{ dimensions.A }}"</span>
-                  </span>
+                  </div>
                 </div>
               </div>
               
@@ -48,9 +47,10 @@
                       width: block === 1 ? `${blockSize}px` : `${block * blockSize}px`
                     }"
                   ></div>
-                  <span class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600 text-center">
-                    Side B - <span class="text-indigo-600 font-bold">{{ dimensions.B }}"</span>
-                  </span>
+                  <div class="absolute top-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                    <span class="text-sm font-medium text-gray-600">Side B</span>
+                    <span class="text-indigo-600 font-bold">{{ dimensions.B }}"</span>
+                  </div>
                 </div>
               </div>
               
@@ -66,11 +66,10 @@
                       height: block === 1 ? `${blockSize}px` : `${block * blockSize}px`
                     }"
                   ></div>
-                  <span class="absolute right-8 top-1/2 transform -translate-y-1/2 text-sm font-medium text-center text-gray-600 text-center">
-                    Side C
-                    <br>
+                  <div class="absolute left-8 top-1/2 transform -translate-y-1/2 flex flex-col items-start">
+                    <span class="text-sm font-medium text-gray-600">Side C</span>
                     <span class="text-indigo-600 font-bold">{{ dimensions.C }}"</span>
-                  </span>
+                  </div>
                 </div>
               </div>
               
@@ -86,9 +85,10 @@
                       width: block === 1 ? `${blockSize}px` : `${block * blockSize}px`
                     }"
                   ></div>
-                  <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
-                    Side D <span class="text-indigo-600 font-bold">{{ dimensions.D }}"</span>
-                  </span>
+                  <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                    <span class="text-sm font-medium text-gray-600">Side D</span>
+                    <span class="text-indigo-600 font-bold">{{ dimensions.D }}"</span>
+                  </div>
                 </div>
               </div>
               
@@ -104,11 +104,10 @@
                       height: block === 1 ? `${blockSize}px` : `${block * blockSize}px`
                     }"
                   ></div>
-                  <span class="absolute -right-16 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-600 text-center">
-                    Side E
-                    <br>
+                  <div class="absolute -right-16 top-1/2 transform -translate-y-1/2 flex flex-col items-start">
+                    <span class="text-sm font-medium text-gray-600">Side E</span>
                     <span class="text-indigo-600 font-bold">{{ dimensions.E }}"</span>
-                  </span>
+                  </div>
                 </div>
               </div>
             </div>

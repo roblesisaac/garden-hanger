@@ -99,7 +99,7 @@ const routes = [
     path: '/custom',
     name: 'Custom Bracket Builder',
     component: CustomBracketBuilder,
-    // meta: { hide: true }  
+    meta: { hide: true }  
   }
 ];
 

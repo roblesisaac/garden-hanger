@@ -137,6 +137,9 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import useScreen from '../composables/useScreen';
+
+const { screenSize } = useScreen();
 
 const dimensions = ref({
     A: 2,      // Vertical, bottom left
@@ -156,19 +159,19 @@ const updateDimension = (side, value) => {
     dimensions.value[side] = parseFloat(value) || 0
 }
 
-const blockSize = 20;
+const blockSize = computed(() => screenSize.value === 'large' ? 20 : 12);
 const bracketBottom = 20;
 const sideAStartLeft = 70;
-const sideBStartLeft = computed(() => sideAStartLeft + blockSize);
-const sideBWidth = computed(() => dimensions.value.B * blockSize);
-const sideCStartLeft = computed(() => sideAStartLeft + blockSize + sideBWidth.value);
-const sideCHeight = computed(() => dimensions.value.C * blockSize);
-const sideDStartLeft = computed(() => sideCStartLeft.value + blockSize);
-const sideDBottom = computed(() => sideCHeight.value - blockSize + bracketBottom);
-const sideDWidth = computed(() => dimensions.value.D * blockSize);
-const sideELeft = computed(() => sideDStartLeft.value + dimensions.value.D * blockSize);
-const sideEBottom = computed(() => bracketBottom + sideCHeight.value - dimensions.value.E * blockSize);
-const bracketOuterWidth = computed(() => 140 + sideBWidth.value + sideDWidth.value + (blockSize*3));
+const sideBStartLeft = computed(() => sideAStartLeft + blockSize.value);
+const sideBWidth = computed(() => dimensions.value.B * blockSize.value);
+const sideCStartLeft = computed(() => sideAStartLeft + blockSize.value + sideBWidth.value);
+const sideCHeight = computed(() => dimensions.value.C * blockSize.value);
+const sideDStartLeft = computed(() => sideCStartLeft.value + blockSize.value);
+const sideDBottom = computed(() => sideCHeight.value - blockSize.value + bracketBottom);
+const sideDWidth = computed(() => dimensions.value.D * blockSize.value);
+const sideELeft = computed(() => sideDStartLeft.value + dimensions.value.D * blockSize.value);
+const sideEBottom = computed(() => bracketBottom + sideCHeight.value - dimensions.value.E * blockSize.value);
+const bracketOuterWidth = computed(() => 140 + sideBWidth.value + sideDWidth.value + (blockSize.value*3));
 const bracketOuterHeight = computed(() => sideCHeight.value);
 
 </script>

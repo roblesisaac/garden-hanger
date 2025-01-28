@@ -75,6 +75,7 @@ export async function createStripeOrder(stripeSessionId, orderItems, user) {
     const savedOrder = await Orders.save({
         userid: user ? user._id : 'guest',
         stripeSessionId: id,
+        orderSource: 'website',
         totalPrice: amount_total,
         orderItems,
         status: 'created',

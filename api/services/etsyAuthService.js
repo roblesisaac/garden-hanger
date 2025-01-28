@@ -6,8 +6,8 @@ const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
 export class EtsyAuthService {
   constructor() {
-    this.clientId = process.env.ETSY_API_KEY;
-    this.clientSecret = process.env.ETSY_SHARED_SECRET;
+    this.clientId = config.ETSY.API_KEY;
+    this.clientSecret = config.ETSY.SHARED_SECRET;
     this.redirectUri = config.AMPT_URL;
     this.scopes = ['transactions_r', 'listings_r', 'orders_r'];
   }

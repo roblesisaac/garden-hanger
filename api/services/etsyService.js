@@ -1,11 +1,12 @@
 import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
+import config from '../config/environment.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
 export class EtsyService {
   constructor() {
-    this.apiKey = process.env.ETSY_API_KEY;
+    this.apiKey = config.ETSY.API_KEY;
   }
 
   async getHeaders(req) {

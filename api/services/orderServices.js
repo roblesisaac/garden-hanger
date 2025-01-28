@@ -252,8 +252,6 @@ export async function syncEtsyOrders(req) {
           continue;
         }
 
-        console.log('etsyOrder', etsyOrder);
-
         const orderData = {
           _id: etsyOrder._id,
           orderId: etsyOrder.receipt_id.toString(),
@@ -296,6 +294,7 @@ export async function syncEtsyOrders(req) {
         };
 
         const savedOrder = await Orders.save(orderData);
+        console.log('savedOrder', savedOrder._id);
         savedOrders.push(savedOrder);
       } catch (error) {
         console.error('Error saving order:', error);

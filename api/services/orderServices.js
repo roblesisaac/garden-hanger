@@ -245,13 +245,13 @@ export async function syncEtsyOrders(req) {
 
     for (const etsyOrder of etsyOrders.results) {
       try {
-        if (existingOrderIds.has(etsyOrder.receipt_id.toSring())) {
+        if (existingOrderIds.has(String(etsyOrder.receipt_id))) {
           continue;
         }
 
         const orderData = {
           _id: `orders:${etsyOrder._id}`,
-          orderId: String(etsyOrder.receipt_id),
+          orderId: etsyOrder.receipt_id.toString(),
           userid: req.session.etsyToken.userId,
           orderSource: 'etsy',
           etsyReceiptId: etsyOrder.receipt_id,

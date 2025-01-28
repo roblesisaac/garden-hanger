@@ -86,6 +86,7 @@ export class EtsyService {
               req,
               `/application/shops/${shopId}/receipts/${order.receipt_id}`
             );
+            console.log(orderDetails);
             return {
               ...order,
               ...orderDetails, // Merge order details with original order
@@ -106,8 +107,6 @@ export class EtsyService {
           }
         })
       );
-
-      console.log('ordersWithDetails::', ordersWithDetails);
 
       return {
         ...orders,

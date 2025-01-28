@@ -94,7 +94,7 @@
         <div v-if="userStore.isAdmin" class="mt-8 space-y-4">
           <!-- Admin Capture / Refund Buttons -->
           <OrderPaymentManager 
-            v-if="orderData.stripeSession"
+            v-if="orderData.stripeSession && orderData.orderSource !== 'etsy'"
             :orderData="orderData" 
             @payment-status-changed="handleUpdateOrder({ paymentStatus: $event })" 
           />

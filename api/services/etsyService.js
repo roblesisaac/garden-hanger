@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
 import { decode } from 'html-entities';
-import generateDate from '../utils/amptModel/utils/generate-date.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 

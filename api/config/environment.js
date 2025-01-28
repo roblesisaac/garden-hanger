@@ -38,6 +38,11 @@ export default {
     CUSTOM_DOMAIN: customDomain,
     domain,
     ENV_NAME,
+    ETSY: {
+      SHARED_SECRET: params('ETSY_SHARED_SECRET'),
+      API_KEY: params('ETSY_API_KEY'),
+      SHOP_ID: params('ETSY_SHOP_ID')
+    },
     FRIENDLY_NAME: params('FRIENDLY_NAME'),
     hostName,
     GoogleConfig: {

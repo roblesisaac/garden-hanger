@@ -1,0 +1,52 @@
+---
+description: Global rules to include in all requests
+globs: 
+---
+# Project Architecture Requirements
+
+## 1. General Principles
+- Follow DRY (Don't Repeat Yourself) principles
+- Write clean, modular code
+- Use meaningful variable and function names
+- Keep functions small and focused
+- Implement proper error handling
+- Use async/await for asynchronous operations
+- Maintain consistent naming conventions
+- Regularly refactor for improved maintainability
+
+## 2. Backend Structure
+- Routes have their individual file specific to the controllers they are using and then are registered in app in the routes/index.ts
+- Implement three-layer architecture:
+src/
+├── controllers/    # Request/response handling
+├── models/        # Database schemas
+├── services/      # Business logic
+├── routes/        # API endpoints
+└── utils/         # Shared helpers
+Copy- Key principles:
+- Database Models are created using the custom class i created in api/utils/amptModel/index.js
+- Controllers handle only request/response logic
+- Services contain all business logic
+- Maintain clear separation of concerns
+- Group related functionality into modules
+
+## 3. Frontend Structure (Vue 3)
+- Use feature-based architecture:
+src/
+├── features/      # Domain-specific code
+└── shared/        # Reusable code
+├── components/
+├── composables/
+└── utils/
+Copy- Key principles:
+- Use Composition API for components
+- Abstract common logic into reusable utilities
+- Group related functionality by feature domain
+- Use lucide-vue-next icons where appropriate, but avoid overuse
+
+## 4. API Architecture
+- Follow three-layer pattern:
+- Web Layer (Controllers)
+- Service Layer (Business Logic)
+- Data Layer (Database Operations)
+- Centralize all business logic in services layer

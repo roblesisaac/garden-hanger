@@ -16,6 +16,8 @@ import orderRouter from './routes/orderRouter';
 import stripeRouter from './routes/stripeRouter';
 import sharpRouter from './routes/sharpRouter';
 import auth0Router from './routes/auth0Router';
+import orderRoutes from './routes/orderRoutes.js';
+import etsyAuthRoutes from './routes/etsyAuthRoutes.js';
 
 const app = express();
 
@@ -42,6 +44,8 @@ api.use('/', shippingRouter);
 api.use('/', dbRouter);
 api.use('/', orderRouter);
 api.use('/', auth0Router);
+api.use('/api/etsy/orders', orderRoutes);
+api.use('/api/etsy/auth', etsyAuthRoutes);
 
 api.use('/*', redirectJson);
 app.use(redirectHtml);

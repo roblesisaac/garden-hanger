@@ -7,6 +7,9 @@
         <AccountControlBoxVue />
       </div>
       
+      <!-- Etsy Integration -->
+      <EtsyIntegration v-if="userStore.isAdmin" class="mb-8" />
+      
       <!-- Orders -->
       <div class="mb-8">
         <div class="flex justify-between items-center mb-4">
@@ -41,6 +44,7 @@
   import { onMounted } from 'vue';
   import OrderRowVue from './OrderRow.vue';
   import AccountControlBoxVue from './AccountControlBox.vue';
+  import EtsyIntegration from './EtsyIntegration.vue';
   
   import { useUserStore } from '../stores/userStore';
   import useOrders from '../composables/useOrders';

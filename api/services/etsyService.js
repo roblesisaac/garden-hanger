@@ -1,0 +1,88 @@
+import fetch from 'node-fetch';
+import etsyAuthService from './etsyAuthService.js';
+
+const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
+
+export class EtsyService {
+  constructor() {
+    this.apiKey = process.env.ETSY_API_KEY;
+  }
+
+  async getHeaders(req) {
+    // Get token from session
+    const accessToken = req.session.etsyToken?.accessToken;
+    
+    if (!accessToken) {
+      throw new Error('No Etsy access token found. Please authenticate first.');
+    }
+
+    // Check if token is expired and needs refresh
+    if (this.isTokenExpired(req.session.etsyToken)) {
+      const refreshedToken = await this.refreshToken(req);
+      req.session.etsyToken = refreshedToken;
+      await req.session.save();
+    }
+
+    return {
+      'x-api-key': this.apiKey,
+      'Authorization': `Bearer ${req.session.etsyToken.accessToken}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  isTokenExpired(token) {
+    if (!token?.expiresAt) return true;
+    // Add 5 minute buffer before expiration
+    return new Date(token.expiresAt).getTime() - 300000 < Date.now();
+  }
+
+  async refreshToken(req) {
+    const refreshToken = req.session.etsyToken?.refreshToken;
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const tokenData = await etsyAuthService.refreshAccessToken(refreshToken);
+    return {
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000)),
+    };
+  }
+
+  async fetchOrders(req, params = {}) {
+    try {
+      const shopId = req.session.etsyToken?.shopId;
+      if (!shopId) {
+        throw new Error('No shop ID found in session');
+      }
+
+      const queryParams = new URLSearchParams({
+        shop_id: shopId,
+        limit: params.limit || '50',
+        offset: params.offset || '0',
+        ...params
+      });
+
+      const response = await fetch(
+        `${ETSY_API_BASE}/application/shops/${shopId}/receipts?${queryParams}`,
+        {
+          method: 'GET',
+          headers: await this.getHeaders(req),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Etsy API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw new Error(`Failed to fetch Etsy orders: ${error.message}`);
+    }
+  }
+}
+
+export default new EtsyService(); 

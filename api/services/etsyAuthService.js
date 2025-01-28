@@ -10,7 +10,7 @@ export class EtsyAuthService {
   constructor() {
     this.clientId = config.ETSY.API_KEY;
     this.clientSecret = config.ETSY.SHARED_SECRET;
-    this.redirectUri = `${config.AMPT_URL}/api/etsy/auth/callback`;
+    this.redirectUri = `${config.baseUrl}/api/etsy/auth/callback`;
     this.scopes = [
       'email_r',
       'shops_r', 

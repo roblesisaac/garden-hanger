@@ -52,7 +52,25 @@ export default function useOrders() {
         try {
             const orders = await get(apiEndpoint);
             console.log('Retrieved orders:', orders);
-            orderItems.value = orders.sort((a, b) => {
+            orderItems.value = orders.map(order => {
+                // Add empty stripeSession for Etsy orders to prevent null reference errors
+                if (order.orderSource === 'etsy') {
+                    return {
+                        ...order,
+                        stripeSession: {
+                            line_items: {
+                                data: order.orderItems.map(item => ({
+                                    id: item._id,
+                                    description: item.title,
+                                    quantity: item.qty,
+                                    amount_total: 0 // Etsy orders handle pricing differently
+                                }))
+                            }
+                        }
+                    };
+                }
+                return order;
+            }).sort((a, b) => {
                 const dateA = a.orderSource === 'etsy' ? 
                     new Date(a.createdTimestamp * 1000) : 
                     new Date(a._id.split('_')[0]);

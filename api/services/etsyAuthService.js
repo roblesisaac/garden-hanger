@@ -10,6 +10,13 @@ export class EtsyAuthService {
     this.clientSecret = config.ETSY.SHARED_SECRET;
     this.redirectUri = config.AMPT_URL;
     this.scopes = ['transactions_r', 'listings_r', 'orders_r'];
+
+    console.log({
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+        redirectUri: this.redirectUri,
+        scopes: this.scopes
+    })
   }
 
   getAuthUrl() {

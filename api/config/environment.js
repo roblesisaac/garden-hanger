@@ -39,9 +39,8 @@ export default {
     domain,
     ENV_NAME,
     ETSY: {
-      SHARED_SECRET: params('ETSY_SHARED_SECRET'),
-      API_KEY: params('ETSY_API_KEY'),
-      SHOP_ID: params('ETSY_SHOP_ID')
+      API_KEY: params('API_KEY'),
+      SHARED_SECRET: params('SHARED_SECRET'),
     },
     FRIENDLY_NAME: params('FRIENDLY_NAME'),
     hostName,

@@ -231,13 +231,16 @@ export async function syncEtsyOrders(req) {
     const savedOrders = [];
     const errors = [];
 
+    // Get all existing Etsy orders first
+    const existingOrders = await Orders.findAll('orders:etsy_*');
+    const existingOrderIds = new Set(existingOrders.map(order => order._id));
+
     for (const etsyOrder of etsyOrders.results) {
       try {
         const etsyOrderId = `orders:etsy_${etsyOrder.receipt_id}`;
         
-        // Check if order already exists using proper query format
-        const existingOrder = await Orders.find(etsyOrderId);
-        if (existingOrder?.items?.[0]) {
+        // Check if order already exists in our set
+        if (existingOrderIds.has(etsyOrderId)) {
           continue; // Skip if already exists
         }
 

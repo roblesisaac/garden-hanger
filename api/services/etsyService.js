@@ -76,16 +76,12 @@ export class EtsyService {
         }
       );
 
-      console.log(`response okay ${response.ok}::`, response);
-
-      if (!response.ok) {
+     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Etsy API error: ${response.status} ${response.statusText} - ${errorData.error}`);
       }
 
       const data = await response.json();
-      console.log('orders');
-      console.log(data);
       return data;
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);

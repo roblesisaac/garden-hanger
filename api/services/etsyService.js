@@ -110,6 +110,8 @@ export class EtsyService {
         };
       });
 
+      console.log(transformedOrders);
+
       return {
         ...orders,
         results: transformedOrders

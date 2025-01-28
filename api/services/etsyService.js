@@ -110,7 +110,7 @@ export class EtsyService {
           },
           orderItems: order.transactions.map(item => {
             const existingListing = listings.find(listing => listing.etsyLookup === item.sku);
-            console.log(existingListing);
+            console.log(item.sku, existingListing);
             return {
                 _id: `etsy_${item.transaction_id}`,
                 title: existingListing?.title || item.sku,

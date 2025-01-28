@@ -74,6 +74,7 @@ export function formatDate(inputDate) { // outputs YYYY-MM-DD
 }
 
 export function formatDateFromId(id) {
+    console.log(id);
     try {
         // Handle Unix timestamp (10-digit number)
         if (typeof id === 'number' || (typeof id === 'string' && /^\d{10}$/.test(id))) {

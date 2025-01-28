@@ -241,11 +241,16 @@ export async function syncEtsyOrders(req) {
     const existingOrders = await Orders.findAll({ orderSource: 'etsy' });
     console.log('existingOrders', existingOrders.length);
     const existingOrderIds = new Set(existingOrders.map(order => order.orderId));
+
+    console.log('etsyOrders', etsyOrders.results.length);
     for (const etsyOrder of etsyOrders.results) {
       try {
         const etsyOrderId = `${etsyOrder.orderId}`;
+
+        console.log(etsyOrderId);
         
         if (existingOrderIds.has(etsyOrderId)) {
+            console.log('skipping', etsyOrderId);
           continue;
         }
 

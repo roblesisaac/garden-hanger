@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import crypto from 'crypto';
 import config from '../config/environment';
 
 const ETSY_AUTH_BASE = 'https://api.etsy.com/v3/public/oauth';
@@ -12,20 +13,46 @@ export class EtsyAuthService {
     this.scopes = ['transactions_r', 'listings_r', 'orders_r'];
   }
 
-  getAuthUrl() {
-    const params = new URLSearchParams({
-      grant_type: 'authorization_code',
-      client_id: this.clientId,
-      redirect_uri: this.redirectUri,
-      scope: this.scopes.join(' '),
-      response_type: 'code',
-      state: Math.random().toString(36).substring(7),
-    });
-
-    return `${ETSY_AUTH_BASE}/connect?${params}`;
+  // Generate code verifier for PKCE
+  generateCodeVerifier() {
+    return crypto.randomBytes(32)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
   }
 
-  async getAccessToken(code) {
+  // Generate code challenge from verifier
+  async generateCodeChallenge(verifier) {
+    const hash = crypto.createHash('sha256')
+      .update(verifier)
+      .digest('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+    return hash;
+  }
+
+  async getAuthUrl() {
+    const codeVerifier = this.generateCodeVerifier();
+    const codeChallenge = await this.generateCodeChallenge(codeVerifier);
+
+    // Store code verifier in session to use it later
+    return {
+      url: `${ETSY_AUTH_BASE}/connect?${new URLSearchParams({
+        response_type: 'code',
+        client_id: this.clientId,
+        redirect_uri: this.redirectUri,
+        scope: this.scopes.join(' '),
+        state: Math.random().toString(36).substring(7),
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256'
+      })}`,
+      codeVerifier
+    };
+  }
+
+  async getAccessToken(code, codeVerifier) {
     try {
       const response = await fetch(`${ETSY_AUTH_BASE}/token`, {
         method: 'POST',
@@ -37,6 +64,7 @@ export class EtsyAuthService {
           client_id: this.clientId,
           redirect_uri: this.redirectUri,
           code: code,
+          code_verifier: codeVerifier
         })
       });
 

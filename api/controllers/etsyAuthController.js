@@ -1,13 +1,25 @@
 import etsyAuthService from '../services/etsyAuthService.js';
 
-export const initiateAuth = (req, res) => {
-  // Store the return URL in session if provided
-  if (req.query.returnUrl) {
-    req.session.etsyAuthReturnUrl = req.query.returnUrl;
+export const initiateAuth = async (req, res) => {
+  try {
+    // Store the return URL in session if provided
+    if (req.query.returnUrl) {
+      req.session.etsyAuthReturnUrl = req.query.returnUrl;
+    }
+    
+    const { url, codeVerifier } = await etsyAuthService.getAuthUrl();
+    
+    // Store the code verifier in session
+    req.session.etsyCodeVerifier = codeVerifier;
+    await req.session.save();
+    
+    res.redirect(url);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
-  
-  const authUrl = etsyAuthService.getAuthUrl();
-  res.redirect(authUrl);
 };
 
 export const handleCallback = async (req, res) => {
@@ -18,7 +30,13 @@ export const handleCallback = async (req, res) => {
       throw new Error('No authorization code received');
     }
 
-    const tokenData = await etsyAuthService.getAccessToken(code);
+    // Get code verifier from session
+    const codeVerifier = req.session.etsyCodeVerifier;
+    if (!codeVerifier) {
+      throw new Error('No code verifier found in session');
+    }
+
+    const tokenData = await etsyAuthService.getAccessToken(code, codeVerifier);
     
     // Get the shop ID
     const shopId = await etsyAuthService.getUserShops(tokenData.accessToken);
@@ -31,6 +49,8 @@ export const handleCallback = async (req, res) => {
       shopId: shopId
     };
 
+    // Clean up code verifier
+    delete req.session.etsyCodeVerifier;
     await req.session.save();
 
     // Redirect back to original page if set

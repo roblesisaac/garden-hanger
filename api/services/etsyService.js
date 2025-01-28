@@ -109,8 +109,7 @@ export class EtsyService {
             email: order.buyer_email || ''
           },
           orderItems: order.transactions.map(item => {
-            const existingListing = listings.find(listing => listing.etsyLookup === item.sku);
-            console.log(item.sku, existingListing);
+            const existingListing = listings.find(listing => listing.etsyLookup.toLowerCase() === item.sku.toLowerCase());
             return {
                 _id: `etsy_${item.transaction_id}`,
                 title: existingListing?.title || item.sku,

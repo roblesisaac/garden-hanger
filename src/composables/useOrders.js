@@ -60,7 +60,7 @@ export default function useOrders() {
                             line_items: {
                                 data: order.orderItems.map(item => ({
                                     id: item._id,
-                                    description: item.title,
+                                    description: item.sku,
                                     quantity: item.qty,
                                     amount_total: 0
                                 }))
@@ -78,6 +78,7 @@ export default function useOrders() {
                     new Date(b._id.split('_')[0]);
                 return dateB - dateA;
             });
+            console.log(orderItems.value)
             return orderItems.value;
         } catch (err) {
             console.error('Error fetching orders:', err);

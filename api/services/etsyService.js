@@ -81,7 +81,7 @@ export class EtsyService {
       
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp
-        const orderDate = new Date(order.created_timestamp * 1000).toISOString();
+        const orderDate = new Date(order.createdTimestamp * 1000).toISOString();
         const dateForId = orderDate.replace(/[:]/g, '-');
         
         return {

@@ -74,7 +74,6 @@ export function formatDate(inputDate) { // outputs YYYY-MM-DD
 }
 
 export function formatDateFromId(id) {
-    console.log(id);
     try {
         // Handle Unix timestamp (10-digit number)
         if (typeof id === 'number' || (typeof id === 'string' && /^\d{10}$/.test(id))) {
@@ -111,6 +110,7 @@ export function formatDateFromId(id) {
         return "Invalid date";
     }
 }
+
 
 function formatDateTime(date) {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

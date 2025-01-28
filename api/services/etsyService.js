@@ -84,6 +84,7 @@ export class EtsyService {
         const orderDate = new Date(order.created_timestamp * 1000).toISOString();
         const random = Math.random().toString(16).substring(2);
         const dateForId = `${orderDate.replace(/[:]/g, '-')}_${random}`;
+        
         return {
           ...order,
           _id: dateForId, // Add formatted date as _id for consistency

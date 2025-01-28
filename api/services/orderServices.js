@@ -238,7 +238,8 @@ export async function syncEtsyOrders(req) {
     const errors = [];
 
     // Get all existing Etsy orders first
-    const existingOrders = await Orders.findAll('orders:etsy_*');
+    const existingOrders = await Orders.findAll({ orderSource: 'etsy' });
+    console.log('existingOrders', existingOrders);
     const existingOrderIds = new Set(existingOrders.map(order => order._id));
 
     for (const etsyOrder of etsyOrders.results) {

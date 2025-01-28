@@ -2,7 +2,8 @@ import fetch from 'node-fetch';
 import crypto from 'crypto';
 import config from '../config/environment';
 
-const ETSY_AUTH_BASE = 'https://api.etsy.com/v3/public/oauth';
+const ETSY_AUTH_BASE_CONNECT = 'https://www.etsy.com/oauth';
+const ETSY_AUTH_BASE_TOKEN = 'https://api.etsy.com/v3/public/oauth';
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
 export class EtsyAuthService {
@@ -39,7 +40,7 @@ export class EtsyAuthService {
 
     // Store code verifier in session to use it later
     return {
-      url: `${ETSY_AUTH_BASE}/connect?${new URLSearchParams({
+      url: `${ETSY_AUTH_BASE_CONNECT}/connect?${new URLSearchParams({
         response_type: 'code',
         client_id: this.clientId,
         redirect_uri: this.redirectUri,
@@ -54,7 +55,7 @@ export class EtsyAuthService {
 
   async getAccessToken(code, codeVerifier) {
     try {
-      const response = await fetch(`${ETSY_AUTH_BASE}/token`, {
+      const response = await fetch(`${ETSY_AUTH_BASE_TOKEN}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -86,7 +87,7 @@ export class EtsyAuthService {
 
   async refreshAccessToken(refreshToken) {
     try {
-      const response = await fetch(`${ETSY_AUTH_BASE}/token`, {
+      const response = await fetch(`${ETSY_AUTH_BASE_TOKEN}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

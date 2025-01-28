@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
 import { decode } from 'html-entities';
+import generateDate from '../utils/amptModel/utils/generate-date.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
@@ -81,13 +82,13 @@ export class EtsyService {
       
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp
-        const orderDate = new Date(order.created_timestamp * 1000).toISOString();
-        const random = Math.random().toString(16).substring(2);
-        const dateForId = `${orderDate.replace(/[:]/g, '-')}_${random}`;
-        
+        const orderDate = new Date(order.created_timestamp * 1000);
+        const formattedDate = generateDate(orderDate.toISOString());
+        const random = Math.random().toString(16).slice(2, 14); // Match length of existing random strings
+
         return {
           ...order,
-          _id: dateForId, // Add formatted date as _id for consistency
+          _id: `orders:${formattedDate}_${random}`,
           shipping_address: {
             name: decode(order.name || ''),
             first_line: decode(order.first_line || ''),

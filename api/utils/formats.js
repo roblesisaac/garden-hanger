@@ -46,15 +46,6 @@ export function proper(str) {
     }
 }
 
-export function buildId(yyyymmdd) {
-    try {
-        const random = Math.random().toString(16).substring(2);
-        return `${generateDate(yyyymmdd)}_${random}`;
-    } catch (error) {
-        throwError(error);
-    }
-}
-
 export function formatDate(inputDate) { // outputs YYYY-MM-DD
     try {
         const date = new Date(inputDate);
@@ -75,15 +66,6 @@ export function formatDate(inputDate) { // outputs YYYY-MM-DD
 
 export function formatDateFromId(id) {
     try {
-        // Handle Unix timestamp (10-digit number)
-        if (typeof id === 'number' || (typeof id === 'string' && /^\d{10}$/.test(id))) {
-            const timestamp = typeof id === 'number' ? id : parseInt(id);
-            const date = new Date(timestamp * 1000); // Convert seconds to milliseconds
-            if (!isNaN(date)) {
-                return formatDateTime(date);
-            }
-        }
-
         // First try to match the ISO date format from Etsy orders
         const isoMatch = id.match(/^\d{4}-\d{2}-\d{2}T/);
         if (isoMatch) {
@@ -96,10 +78,7 @@ export function formatDateFromId(id) {
         // Fall back to existing ObjectId date parsing
         const matches = id.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z/g);
         if (matches && matches.length > 0) {
-            const dateString = matches[0].replace(
-                /(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})Z/,
-                '$1-$2-$3T$4:$5:$6Z'
-            );
+            const dateString = matches[0].replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z');
             const date = new Date(dateString);
             return formatDateTime(date);
         }
@@ -110,7 +89,6 @@ export function formatDateFromId(id) {
         return "Invalid date";
     }
 }
-
 
 function formatDateTime(date) {
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

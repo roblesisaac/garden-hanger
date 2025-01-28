@@ -108,12 +108,20 @@ export class EtsyService {
             country_iso: order.country_iso || '',
             email: order.buyer_email || ''
           },
-          orderItems: order.transactions.map(item => ({
-            _id: `etsy_${item.transaction_id}`,
-            title: item.sku,
-            productsInListing: (listings.find(listing => listing.etsyLookup === item.sku) || {}).productsInListing,
-            qty: item.quantity || 1
-          }))
+          orderItems: order.transactions.map(item => {
+            const existingListing = listings.find(listing => listing.etsyLookup === item.sku);
+            return {
+                _id: `etsy_${item.transaction_id}`,
+                title: existingListing?.title || item.sku,
+                productsInListing: existingListing ?
+                    existingListing.productsInListing
+                    : [{
+                        sku: item.sku || '',
+                        qty: item.quantity || 1
+                    }],
+                qty: item.quantity || 1
+            }
+          })
         };
       });
 

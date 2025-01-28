@@ -83,7 +83,8 @@ export class EtsyService {
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp
         const orderDate = new Date(order.created_timestamp * 1000);
-        const formattedDate = generateDate(orderDate.toISOString());
+        const isoDate = orderDate.toISOString().split('.')[0] + 'Z'; // Remove milliseconds
+        const formattedDate = generateDate(isoDate);
         const random = Math.random().toString(16).slice(2, 14); // Match length of existing random strings
 
         return {

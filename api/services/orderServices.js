@@ -234,6 +234,7 @@ export async function updateOrder(orderId, updates) {
 export async function syncEtsyOrders(req) {
   try {
     const etsyOrders = await etsyService.fetchOrders(req);
+    console.log('etsyOrders', etsyOrders.results.length);
     const savedOrders = [];
     const errors = [];
 
@@ -241,6 +242,8 @@ export async function syncEtsyOrders(req) {
     const existingOrders = await Orders.findAll({ orderSource: 'etsy' });
     console.log('existingOrders', existingOrders.length);
     const existingOrderIds = new Set(existingOrders.map(order => order.receipt_id));
+
+    console.log('existingOrderIds', existingOrderIds);
 
     for (const etsyOrder of etsyOrders.results) {
       try {

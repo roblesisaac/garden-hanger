@@ -78,8 +78,34 @@ export class EtsyService {
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
       
-      // Instead of fetching addresses separately, include them in the initial request
-      const ordersWithDetails = await this.fetchOrdersWithDetails(req, orders.results);
+      // Fetch shipping details for each order
+      const ordersWithDetails = await Promise.all(
+        orders.results.map(async (order) => {
+          try {
+            const orderDetails = await this.makeRequest(
+              req,
+              `/application/shops/${shopId}/receipts/${order.receipt_id}`
+            );
+            return {
+              ...order,
+              ...orderDetails, // Merge order details with original order
+              shipping_address: {
+                name: orderDetails.name || '',
+                first_line: orderDetails.first_line || '',
+                second_line: orderDetails.second_line || '',
+                city: orderDetails.city || '',
+                state: orderDetails.state || '',
+                zip: orderDetails.zip || '',
+                formatted_address: orderDetails.formatted_address || '',
+                country_iso: orderDetails.country_iso || ''
+              }
+            };
+          } catch (error) {
+            console.error(`Failed to fetch details for order ${order.receipt_id}:`, error);
+            return order;
+          }
+        })
+      );
 
       console.log('ordersWithDetails::', ordersWithDetails);
 
@@ -97,7 +123,6 @@ export class EtsyService {
       Object.entries({
         limit: '50',
         offset: '0',
-        includes: 'Shipping',  // Add this to get shipping info in initial request
         ...params
       }).filter(([_, value]) => value !== undefined)
     );
@@ -105,27 +130,6 @@ export class EtsyService {
 
   async fetchOrdersData(req, shopId, queryParams) {
     return this.makeRequest(req, `/application/shops/${shopId}/receipts?${queryParams}`);
-  }
-
-  async fetchOrdersWithDetails(req, orders) {
-    return orders.map(order => {
-      // Extract shipping address from the order data directly
-      const shippingAddress = {
-        name: order.name || '',
-        first_line: order.first_line || '',
-        second_line: order.second_line || '',
-        city: order.city || '',
-        state: order.state || '',
-        zip: order.zip || '',
-        formatted_address: order.formatted_address || '',
-        country_iso: order.country_iso || '',
-      };
-
-      return {
-        ...order,
-        shipping_address: shippingAddress
-      };
-    });
   }
 }
 

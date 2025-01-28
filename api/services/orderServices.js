@@ -248,6 +248,8 @@ export async function syncEtsyOrders(req) {
           continue;
         }
 
+        console.log('etsyOrder::', etsyOrder);
+
         // Get formatted address parts
         const addressParts = etsyOrder.formatted_address?.split('\n') || [];
         const [street = '', cityStateZip = ''] = addressParts;

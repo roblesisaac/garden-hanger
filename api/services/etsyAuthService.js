@@ -121,7 +121,8 @@ export class EtsyAuthService {
 
   async getUserShops(accessToken) {
     try {
-      const response = await fetch(`${ETSY_API_BASE}/application/users/me/shops`, {
+      // First get the user ID
+      const userResponse = await fetch(`${ETSY_API_BASE}/application/users/me`, {
         headers: {
           'x-api-key': this.clientId,
           'Authorization': `Bearer ${accessToken}`,
@@ -129,18 +130,35 @@ export class EtsyAuthService {
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Failed to get user shops: ${errorData.error || response.statusText}`);
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json();
+        throw new Error(`Failed to get user info: ${errorData.error || userResponse.statusText}`);
       }
 
-      const data = await response.json();
-      if (!data.shops || data.shops.length === 0) {
+      const userData = await userResponse.json();
+      const userId = userData.user_id;
+
+      // Then get the shops using the user ID
+      const shopsResponse = await fetch(`${ETSY_API_BASE}/application/users/${userId}/shops`, {
+        headers: {
+          'x-api-key': this.clientId,
+          'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json'
+        },
+      });
+
+      if (!shopsResponse.ok) {
+        const errorData = await shopsResponse.json();
+        throw new Error(`Failed to get user shops: ${errorData.error || shopsResponse.statusText}`);
+      }
+
+      const shopsData = await shopsResponse.json();
+      if (!shopsData.shops || shopsData.shops.length === 0) {
         throw new Error('No shops found for this user');
       }
 
       // Return the first shop's ID
-      return data.shops[0].shop_id.toString();
+      return shopsData.shops[0].shop_id.toString();
     } catch (error) {
       console.error('Get user shops error:', error);
       throw new Error(`Failed to get user shops: ${error.message}`);

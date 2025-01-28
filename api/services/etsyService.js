@@ -85,7 +85,8 @@ export class EtsyService {
         console.log('order.createdTimestamp', order.createdTimestamp);
         const orderDate = new Date(order.created_timestamp * 1000).toISOString();
         const dateForId = orderDate.replace(/[:]/g, '-');
-        
+        console.log('orderDate', orderDate);
+        console.log('dateForId', dateForId);
         return {
           ...order,
           _id: dateForId, // Add formatted date as _id for consistency

@@ -59,12 +59,14 @@ export class EtsyService {
         return { count: 0, results: [] }; // Return empty orders if no shop
       }
 
-      const queryParams = new URLSearchParams({
-        shop_id: shopId,
-        limit: params.limit || '50',
-        offset: params.offset || '0',
-        ...params
-      });
+      // Filter out undefined values and set defaults
+      const queryParams = new URLSearchParams(
+        Object.entries({
+          limit: '50',
+          offset: '0',
+          ...params
+        }).filter(([_, value]) => value !== undefined)
+      );
 
       const response = await fetch(
         `${ETSY_API_BASE}/application/shops/${shopId}/receipts?${queryParams}`,
@@ -77,7 +79,8 @@ export class EtsyService {
       console.log(`response okay ${response.ok}::`, response);
 
       if (!response.ok) {
-        throw new Error(`Etsy API error: ${response.status} ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(`Etsy API error: ${response.status} ${response.statusText} - ${errorData.error}`);
       }
 
       const data = await response.json();

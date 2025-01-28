@@ -99,7 +99,7 @@
         </div>
       
         <!-- Admin Section -->
-        <div v-if="userStore.isAdmin class="mt-8 space-y-4">
+        <div v-if="userStore.isAdmin" class="mt-8 space-y-4">
           <!-- Admin Capture / Refund Buttons -->
           <OrderPaymentManager 
             v-if="orderData.stripeSession"

@@ -32,7 +32,8 @@ const listingSchema = {
     ],
     label1: 'title',
     label2: 'line',
-    label3: 'status'
+    label3: 'status',
+    label4: 'etsyLookup'
 
 }
 

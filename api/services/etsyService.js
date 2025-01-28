@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
 import { decode } from 'html-entities';
+import listings from '../models/listings.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
@@ -78,6 +79,9 @@ export class EtsyService {
 
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
+      const listings = await listings.findAll({});
+
+      console.log(listings);
       
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp

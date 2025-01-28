@@ -140,7 +140,7 @@ function formatItems(items) {
 }
 
 function getHeaders() {
-    const authToken = isProd() ? config.SHIP.EASYSHIP_PROD : config.SHIP.EASYSHIP_SAND;
+    const authToken = isProd() ? config.SHIP.EASYSHIP_PROD : config.SHIP.EASYSHIP_PROD;
 
     return {
         'Content-Type': 'application/json',

@@ -160,7 +160,7 @@ function formatShipmentParcels(shipment) {
 }
 
 function getHeaders() {
-    const authToken = isProd() ? config.SHIP.SHIPPO_PROD : config.SHIP.SHIPPO_TEST;
+    const authToken = isProd() ? config.SHIP.SHIPPO_PROD : config.SHIP.SHIPPO_PROD;
 
     return {
         'Content-Type': 'application/json',

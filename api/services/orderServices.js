@@ -97,6 +97,13 @@ export async function createStripeOrder(stripeSessionId, orderItems, user) {
 export async function getStripeOrderSession(order) {
     const { stripeSessionId, ...restOrder } = order;
 
+    if(!stripeSessionId) {
+        return {
+            ...order,
+            stripeSession: stripeSessionId
+        }
+    }
+
     return {
         ...restOrder,
         stripeSession: await StripeService.retreiveStripeSession(stripeSessionId)

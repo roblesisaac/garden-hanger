@@ -59,7 +59,8 @@ const orderSchema = {
     label1: 'userid',
     label2: 'stripeSessionId',
     label3: 'orderEmail',
-    label4: 'status'
+    label4: 'status',
+    label5: 'orderSource'
 }
 
 const orderModel = AmptModel('orders', orderSchema);

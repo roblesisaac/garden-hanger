@@ -81,6 +81,7 @@ export default function useOrders() {
             });
             
             console.log('Processed orders:', orderItems.value);
+            console.log('orderItems.value::', orderItems.value);
             return orderItems.value;
         } catch (err) {
             console.error('Error fetching orders:', err);

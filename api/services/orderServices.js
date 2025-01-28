@@ -242,7 +242,7 @@ export async function syncEtsyOrders(req) {
     console.log('existingOrders', existingOrders.length);
     const existingOrderIds = new Set(existingOrders.map(order => order.orderId));
 
-    console.log('etsyOrders', etsyOrders.results.length);
+    console.log('etsyOrders', etsyOrders.results[0]);
     for (const etsyOrder of etsyOrders.results) {
       try {
         const etsyOrderId = `${etsyOrder.orderId}`;

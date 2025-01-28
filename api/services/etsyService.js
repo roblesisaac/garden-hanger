@@ -82,6 +82,8 @@ export class EtsyService {
 
       const data = await response.json();
       
+      console.log(data.results.length);
+      
       // Fetch shipping addresses for each order
       const ordersWithAddresses = await Promise.all(
         data.results.map(async (order) => {
@@ -110,6 +112,8 @@ export class EtsyService {
           }
         })
       );
+
+      console.log(ordersWithAddresses);
 
       return {
         ...data,

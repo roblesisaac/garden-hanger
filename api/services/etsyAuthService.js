@@ -8,17 +8,18 @@ export class EtsyAuthService {
   constructor() {
     this.clientId = config.ETSY.API_KEY;
     this.clientSecret = config.ETSY.SHARED_SECRET;
-    this.redirectUri = config.AMPT_URL;
+    this.redirectUri = `${config.AMPT_URL}/api/etsy/auth/callback`;
     this.scopes = ['transactions_r', 'listings_r', 'orders_r'];
   }
 
   getAuthUrl() {
     const params = new URLSearchParams({
-      response_type: 'code',
+      grant_type: 'authorization_code',
       client_id: this.clientId,
       redirect_uri: this.redirectUri,
       scope: this.scopes.join(' '),
-      state: Math.random().toString(36).substring(7), // Generate random state
+      response_type: 'code',
+      state: Math.random().toString(36).substring(7),
     });
 
     return `${ETSY_AUTH_BASE}/connect?${params}`;
@@ -29,18 +30,19 @@ export class EtsyAuthService {
       const response = await fetch(`${ETSY_AUTH_BASE}/token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json'
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
           grant_type: 'authorization_code',
           client_id: this.clientId,
           redirect_uri: this.redirectUri,
           code: code,
-        }),
+        })
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to get access token: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(`Failed to get access token: ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();

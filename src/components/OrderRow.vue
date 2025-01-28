@@ -127,7 +127,6 @@
         </div>
       </div>
     </div>
-  </div>
   
   <!-- Toggle Row Arrows -->
   <div @click="toggleExpand" class="cursor-pointer p-2 border-t border-gray-200 bg-gray-50 flex items-center justify-center">

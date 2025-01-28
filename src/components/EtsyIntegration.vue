@@ -36,9 +36,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useUserStore } from '../stores/userStore';
+import useOrders from '../composables/useOrders';
 
-const userStore = useUserStore();
+const { appendEtsyOrders, orderItems } = useOrders();
 const isConnected = ref(false);
 const isSyncing = ref(false);
 const error = ref(null);
@@ -82,6 +82,7 @@ async function syncOrders() {
     }
 
     lastSyncTime.value = new Date().toLocaleString();
+    appendEtsyOrders(data.savedOrders);
   } catch (err) {
     error.value = err.message || 'Failed to sync orders';
   } finally {

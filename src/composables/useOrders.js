@@ -10,6 +10,14 @@ const loading = ref(false);
 
 export default function useOrders() {
 
+    function appendEtsyOrders(orders) {
+        orderItems.value = [...orders, ...orderItems.value].sort((a, b) => {
+            const dateA = new Date(a._id.split('_')[0])
+            const dateB = new Date(b._id.split('_')[0])
+            return dateB - dateA;
+        });
+    }
+
     async function captureOrder(order) {
         try {
             const capturedOrder = await post('orders/capture/' + order._id);
@@ -70,12 +78,8 @@ export default function useOrders() {
                 }
                 return order;
             }).sort((a, b) => {
-                const dateA = a.orderSource === 'etsy' ? 
-                    new Date(a.createdTimestamp * 1000) : 
-                    new Date(a._id.split('_')[0]);
-                const dateB = b.orderSource === 'etsy' ? 
-                    new Date(b.createdTimestamp * 1000) : 
-                    new Date(b._id.split('_')[0]);
+                const dateA = new Date(a._id.split('_')[0])
+                const dateB = new Date(b._id.split('_')[0])
                 return dateB - dateA;
             });
             console.log(orderItems.value)
@@ -158,6 +162,7 @@ export default function useOrders() {
 
 
     return  {
+        appendEtsyOrders,
         loading,
         captureOrder,
         cancelOrder,

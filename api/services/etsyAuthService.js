@@ -150,11 +150,10 @@ export class EtsyAuthService {
 
         if (shopsResponse.ok) {
           const shopsData = await shopsResponse.json();
-          console.log(shopsData);
-          if (shopsData.shops && shopsData.shops.length > 0) {
+          if (!!shopsData) {
             return {
               userId: userId.toString(),
-              shopId: shopsData.shops[0].shop_id.toString()
+              shopId: shopsData.shop_id.toString()
             };
           }
         }

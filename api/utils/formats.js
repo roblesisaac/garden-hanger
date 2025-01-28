@@ -74,26 +74,44 @@ export function formatDate(inputDate) { // outputs YYYY-MM-DD
 }
 
 export function formatDateFromId(id) {
-    const matches = id.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z/g);
-    if (matches && matches.length > 0) {
-        const dateString = matches[0].replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z');
-        const utcDate = new Date(dateString);
+    try {
+        // First try to match the ISO date format from Etsy orders
+        const isoMatch = id.match(/^\d{4}-\d{2}-\d{2}T/);
+        if (isoMatch) {
+            const date = new Date(id);
+            if (!isNaN(date)) {
+                return formatDateTime(date);
+            }
+        }
+
+        // Fall back to existing ObjectId date parsing
+        const matches = id.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z/g);
+        if (matches && matches.length > 0) {
+            const dateString = matches[0].replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})Z/, '$1-$2-$3T$4:$5:$6Z');
+            const date = new Date(dateString);
+            return formatDateTime(date);
+        }
         
-        // Convert to PST (UTC-8)
-        const pstDate = new Date(utcDate.getTime() - 12 * 60 * 60 * 1000);
-        
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const month = months[pstDate.getUTCMonth()];
-        const day = pstDate.getUTCDate();
-        const year = pstDate.getUTCFullYear();
-        
-        const hours = pstDate.getUTCHours().toString().padStart(2, '0');
-        const minutes = pstDate.getUTCMinutes().toString().padStart(2, '0');
-        const seconds = pstDate.getUTCSeconds().toString().padStart(2, '0');
-        
-        const time = `${hours}:${minutes}:${seconds} PST`;
-        
-        return `${month} ${day}, ${year} at ${time}`;
+        return "Invalid date";
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return "Invalid date";
     }
-    return "Invalid date";
+}
+
+function formatDateTime(date) {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    // Convert to PST (UTC-8)
+    const pstDate = new Date(date.getTime() - 8 * 60 * 60 * 1000);
+    
+    const month = months[pstDate.getMonth()];
+    const day = pstDate.getDate();
+    const year = pstDate.getFullYear();
+    
+    const hours = pstDate.getHours().toString().padStart(2, '0');
+    const minutes = pstDate.getMinutes().toString().padStart(2, '0');
+    const seconds = pstDate.getSeconds().toString().padStart(2, '0');
+    
+    return `${month} ${day}, ${year} at ${hours}:${minutes}:${seconds} PST`;
 }

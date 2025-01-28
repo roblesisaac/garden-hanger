@@ -164,15 +164,20 @@ const isEditingAddress = ref(false);
 const showCancelOrder = ref(false);
 
 const canUpdateAddress = computed(() => {
-    const { status } = props.orderData;
-    return ['created', 'on_hold'].includes(status.toLowerCase());
+  // Allow admin to edit address regardless of status
+  if (userStore.isAdmin) return true;
+  
+  const { status } = props.orderData;
+  return ['created', 'on_hold'].includes(status.toLowerCase());
 });
 
 const canPrintShippingLabel = computed(() => {
-    const { purchasedLabelUrl, paymentStatus } = props.orderData;
-    const unacceptableStatuses = ['unpaid', 'failed'];
-
-    return !purchasedLabelUrl && !unacceptableStatuses.includes(paymentStatus.toLowerCase());
+  // Allow admin to print label if no label exists yet
+  if (userStore.isAdmin) return !props.orderData.purchasedLabelUrl;
+  
+  const { purchasedLabelUrl, paymentStatus } = props.orderData;
+  const unacceptableStatuses = ['unpaid', 'failed'];
+  return !purchasedLabelUrl && !unacceptableStatuses.includes(paymentStatus.toLowerCase());
 });
 
 const toggleExpand = () => {
@@ -184,12 +189,12 @@ const toggleEditAddress = () => {
 };
 
 const getOrderTitle = () => {
-    if (props.orderData.orderSource === 'etsy') {
-        const firstItem = props.orderData.orderItems[0];
-        return firstItem ? firstItem.title : 'Untitled Order';
-    }
-    const firstItem = props.orderData.stripeSession?.line_items?.data[0];
-    return firstItem ? firstItem.description : 'Untitled Order';
+  if (props.orderData.orderSource === 'etsy') {
+    const firstItem = props.orderData.orderItems[0];
+    return firstItem ? firstItem.title : 'Untitled Order';
+  }
+  const firstItem = props.orderData.stripeSession?.line_items?.data[0];
+  return firstItem ? firstItem.description : 'Untitled Order';
 };
 
 const getItemCount = () => {

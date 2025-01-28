@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
+import { decode } from 'html-entities';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
@@ -78,21 +79,36 @@ export class EtsyService {
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
       
-      const transformedOrders = orders.results.map(order => ({
-        ...order,
-        shipping_address: {
-          name: order.name || '',
-          first_line: '', // Reserved for future Etsy preferred partnership
-          second_line: '',
-          city: '',
-          state: '',
-          zip: '',
-          formatted_address: '',
-          country_iso: '',
-          // Include buyer email if available since we can access that
-          email: order.buyer_email || ''
-        }
-      }));
+      const transformedOrders = orders.results.map(order => {
+        // Create ISO date string from Etsy timestamp
+        const orderDate = new Date(order.created_timestamp * 1000).toISOString();
+        const dateForId = orderDate.replace(/[:]/g, '-');
+        
+        return {
+          ...order,
+          _id: dateForId, // Add formatted date as _id for consistency
+          shipping_address: {
+            name: decode(order.name || ''),
+            first_line: decode(order.first_line || ''),
+            second_line: decode(order.second_line || ''),
+            city: decode(order.city || ''),
+            state: decode(order.state || ''),
+            zip: order.zip || '',
+            formatted_address: decode(order.formatted_address || ''),
+            country_iso: order.country_iso || '',
+            email: order.buyer_email || ''
+          },
+          orderItems: order.transactions.map(item => ({
+            _id: `etsy_${item.transaction_id}`,
+            title: decode(item.title || ''),
+            productsInListing: [{
+              sku: item.sku || '',
+              qty: item.quantity || 1
+            }],
+            qty: item.quantity || 1
+          }))
+        };
+      });
 
       return {
         ...orders,

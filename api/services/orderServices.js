@@ -232,6 +232,7 @@ export async function updateOrder(orderId, updates) {
 
 export async function syncEtsyOrders(req) {
   try {
+    console.log('syncing orders');
     const etsyOrders = await etsyService.fetchOrders(req);
     const savedOrders = [];
     const errors = [];

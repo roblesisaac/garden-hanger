@@ -11,10 +11,18 @@ export const initiateAuth = async (req, res) => {
     
     // Store the code verifier in session
     req.session.etsyCodeVerifier = codeVerifier;
-    await req.session.save();
+    
+    // Force session save before redirect
+    await new Promise((resolve, reject) => {
+      req.session.save(err => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
     
     res.redirect(url);
   } catch (error) {
+    console.error('Etsy auth initiation error:', error);
     res.status(500).json({
       success: false,
       error: error.message
@@ -29,7 +37,7 @@ export const handleCallback = async (req, res) => {
       throw new Error(`Etsy OAuth error: ${req.query.error} - ${req.query.error_description}`);
     }
 
-    const { code } = req.query;
+    const { code, state } = req.query;
     
     if (!code) {
       throw new Error('No authorization code received');
@@ -37,8 +45,14 @@ export const handleCallback = async (req, res) => {
 
     // Get code verifier from session
     const codeVerifier = req.session.etsyCodeVerifier;
+    console.log('Session data:', {
+      sessionId: req.sessionID,
+      hasCodeVerifier: !!codeVerifier,
+      sessionContent: req.session
+    });
+
     if (!codeVerifier) {
-      throw new Error('No code verifier found in session');
+      throw new Error('No code verifier found in session. Session may have expired.');
     }
 
     const tokenData = await etsyAuthService.getAccessToken(code, codeVerifier);
@@ -56,10 +70,17 @@ export const handleCallback = async (req, res) => {
 
     // Clean up code verifier
     delete req.session.etsyCodeVerifier;
-    await req.session.save();
+    
+    // Force session save
+    await new Promise((resolve, reject) => {
+      req.session.save(err => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
 
     // Redirect back to original page if set
-    const returnUrl = req.session.etsyAuthReturnUrl || '/dashboard';
+    const returnUrl = req.session.etsyAuthReturnUrl || '/my-account';
     delete req.session.etsyAuthReturnUrl;
     
     res.redirect(returnUrl);
@@ -67,7 +88,8 @@ export const handleCallback = async (req, res) => {
     console.error('Etsy auth callback error:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
+      sessionId: req.sessionID
     });
   }
 };

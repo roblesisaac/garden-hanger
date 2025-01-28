@@ -8,8 +8,8 @@ export default function() {
   return session({
     genid: req => req.sessionID = req.sessionID || v4(),
     secret: config.SESSION_ID,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: new CustomStore({
       prefix: 'sessions:',
       reapInterval: 86400000
@@ -17,9 +17,9 @@ export default function() {
     cookie: {
       secure: true,
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       domain: config.domain,
-      maxAge: 30*60*1000,
+      maxAge: 24 * 60 * 60 * 1000,
       signed: true
     }
   });

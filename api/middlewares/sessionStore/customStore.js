@@ -15,38 +15,24 @@ export default class CustomStore extends session.Store {
     }
   }
 
-  async get(sessionId, callback) {
+  async get(sid) {
     try {
-      const key = this.prefix + sessionId;
-      const sessionData = await data.get(key);
-      if (!sessionData) {
-        console.log('No session data for', sessionId);
-        return callback(null, null);
-      }
-      const sess = JSON.parse(sessionData);
-      const now = Math.floor(Date.now() / 1000);
-      if (sess.expires && now >= sess.expires) {
-        return callback(null, null);
-      }
-      callback(null, sess);
-    } catch (error) {
-      callback(error);
+      const result = await data.get(`${this.prefix}${sid}`);
+      console.log('Session get:', { sid, hasSession: !!result });
+      return result ? JSON.parse(result) : null;
+    } catch (err) {
+      console.error('Session get error:', err);
+      return null;
     }
   }
 
-  async set(sessionId, session, callback) {
+  async set(sid, session) {
     try {
-      const key = this.prefix + sessionId;
-      session.cookie.expires = new Date(session.cookie.expires);
-      session.cookie.originalMaxAge = session.cookie.maxAge;
-      const expires = this.getExpiresValue(session);
-      const payload = JSON.stringify({...session, expires});
-      const ttl = Math.round((session.cookie.expires - Date.now()) / 1000);
-
-      await data.set(key, payload, { ttl });
-      callback(null);
-    } catch (error) {
-      callback(error);
+      await data.set(`${this.prefix}${sid}`, JSON.stringify(session));
+      console.log('Session set:', { sid, session });
+    } catch (err) {
+      console.error('Session set error:', err);
+      throw err;
     }
   }
 

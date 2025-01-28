@@ -233,15 +233,17 @@ export async function syncEtsyOrders(req) {
 
     for (const etsyOrder of etsyOrders.results) {
       try {
-        // Check if order already exists
-        const existingOrder = await Orders.findOne(`etsy_${etsyOrder.receipt_id}`);
-        if (existingOrder) {
+        const etsyOrderId = `orders:etsy_${etsyOrder.receipt_id}`;
+        
+        // Check if order already exists using proper query format
+        const existingOrder = await Orders.find(etsyOrderId);
+        if (existingOrder?.items?.[0]) {
           continue; // Skip if already exists
         }
 
         // Transform Etsy order to our format
         const orderData = {
-          _id: `etsy_${etsyOrder.receipt_id}`,
+          _id: etsyOrderId,
           orderId: etsyOrder.receipt_id.toString(),
           userid: req.session.etsyToken.userId,
           orderSource: 'etsy',
@@ -263,7 +265,7 @@ export async function syncEtsyOrders(req) {
             title: transaction.title,
             _id: `etsy_${transaction.transaction_id}`
           })),
-          totalPrice: etsyOrder.total_price.amount,  // Remove division and let schema handle it
+          totalPrice: etsyOrder.total_price.amount,
           status: mapEtsyStatus(etsyOrder.status),
           paymentStatus: etsyOrder.is_paid ? 'paid' : 'unpaid',
           createdTimestamp: etsyOrder.created_timestamp,
@@ -274,7 +276,8 @@ export async function syncEtsyOrders(req) {
           label1: 'userid',
           label2: 'etsyReceiptId',
           label3: 'orderEmail',
-          label4: 'status'
+          label4: 'status',
+          refunds: []
         };
 
         console.log('Saving Etsy order:', orderData);
@@ -299,7 +302,7 @@ export async function syncEtsyOrders(req) {
       syncedOrders: savedOrders.length,
       totalOrders: etsyOrders.count,
       errors: errors.length > 0 ? errors : undefined,
-      savedOrders // Include the saved orders in response
+      savedOrders
     };
   } catch (error) {
     console.error('Sync error:', error);

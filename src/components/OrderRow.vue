@@ -19,7 +19,7 @@
             @status-changed="handleUpdateOrder({ status: $event })"
           />
           <p class="text-lg font-semibold text-green-600">${{ orderData.totalPrice }}</p>
-          <p class="text-xs text-gray-400">{{ formatDateFromId(orderData._id) }}</p>
+          <p class="text-xs text-gray-400">{{ formatDateFromId(orderData.orderSource === 'etsy' ? orderData.created_at : orderData._id) }}</p>
         </div>
       </div>
     </div>

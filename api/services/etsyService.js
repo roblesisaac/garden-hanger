@@ -82,7 +82,7 @@ export class EtsyService {
       }
 
       const data = await response.json();
-      console.log(JSON.stringify(data, null, 2));
+      console.log(Object.keys(data));
       return data;
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);

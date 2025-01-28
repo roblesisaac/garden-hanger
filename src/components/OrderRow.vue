@@ -54,13 +54,21 @@
                 <div>
                     <h4 class="text-md font-semibold text-gray-700 mb-3">Order Items</h4>
                     <ul class="space-y-2">
-                        <li v-for="item in orderData.stripeSession.line_items.data" :key="item.id" class="text-sm bg-gray-50 p-2 rounded">
-                            <router-link :to="'/products/' + item.description.toLowerCase()" class="font-medium text-blue-600">
-                                {{ item.description }}
-                            </router-link>
-                            <span class="text-gray-500 ml-2">(Qty: {{ item.quantity }})</span>
-                            <span class="text-gray-500 ml-2">${{ (item.amount_total / 100).toFixed(2) }}</span>
-                        </li>
+                        <template v-if="orderData.orderSource === 'etsy'">
+                            <li v-for="item in orderData.orderItems" :key="item._id" class="text-sm bg-gray-50 p-2 rounded">
+                                <span class="font-medium text-gray-800">{{ item.title }}</span>
+                                <span class="text-gray-500 ml-2">(Qty: {{ item.qty }})</span>
+                            </li>
+                        </template>
+                        <template v-else>
+                            <li v-for="item in orderData.stripeSession?.line_items?.data" :key="item.id" class="text-sm bg-gray-50 p-2 rounded">
+                                <router-link :to="'/products/' + item.description.toLowerCase()" class="font-medium text-blue-600">
+                                    {{ item.description }}
+                                </router-link>
+                                <span class="text-gray-500 ml-2">(Qty: {{ item.quantity }})</span>
+                                <span class="text-gray-500 ml-2">${{ (item.amount_total / 100).toFixed(2) }}</span>
+                            </li>
+                        </template>
                     </ul>
                 </div>
                 
@@ -181,12 +189,19 @@ const toggleEditAddress = () => {
 };
 
 const getOrderTitle = () => {
-    const firstItem = props.orderData.stripeSession.line_items.data[0];
+    if (props.orderData.orderSource === 'etsy') {
+        const firstItem = props.orderData.orderItems[0];
+        return firstItem ? firstItem.title : 'Untitled Order';
+    }
+    const firstItem = props.orderData.stripeSession?.line_items?.data[0];
     return firstItem ? firstItem.description : 'Untitled Order';
 };
 
 const getItemCount = () => {
-    return props.orderData.stripeSession.line_items.data.reduce((total, item) => total + item.quantity, 0);
+    if (props.orderData.orderSource === 'etsy') {
+        return props.orderData.orderItems.reduce((total, item) => total + item.qty, 0);
+    }
+    return props.orderData.stripeSession?.line_items?.data.reduce((total, item) => total + item.quantity, 0) || 0;
 };
 
 const getStatusClass = () => {

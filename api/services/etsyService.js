@@ -80,8 +80,6 @@ export class EtsyService {
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
       const listings = await listingsModel.findAll({});
-
-      console.log(listings);
       
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp

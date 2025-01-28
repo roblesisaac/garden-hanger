@@ -234,7 +234,6 @@ export async function updateOrder(orderId, updates) {
 export async function syncEtsyOrders(req) {
   try {
     const etsyOrders = await etsyService.fetchOrders(req);
-    console.log('etsyOrders', etsyOrders.results.length);
     const savedOrders = [];
     const errors = [];
 
@@ -243,17 +242,15 @@ export async function syncEtsyOrders(req) {
     console.log('existingOrders', existingOrders.length);
     const existingOrderIds = new Set(existingOrders.map(order => order.receipt_id));
 
-    console.log('existingOrderIds', existingOrderIds);
 
     for (const etsyOrder of etsyOrders.results) {
       try {
         if (existingOrderIds.has(etsyOrder.receipt_id)) {
-            console.log('skipping', etsyOrder.receipt_id);
           continue;
         }
 
         const orderData = {
-          _id: etsyOrder._id,
+          _id: `orders:${etsyOrder._id}`,
           orderId: etsyOrder.receipt_id.toString(),
           userid: req.session.etsyToken.userId,
           orderSource: 'etsy',
@@ -294,7 +291,6 @@ export async function syncEtsyOrders(req) {
         };
 
         const savedOrder = await Orders.save(orderData);
-        console.log('savedOrder', savedOrder._id);
         savedOrders.push(savedOrder);
       } catch (error) {
         console.error('Error saving order:', error);

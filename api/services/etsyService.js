@@ -9,15 +9,14 @@ export class EtsyService {
     this.apiKey = config.ETSY.API_KEY;
   }
 
+  // Authentication and Headers
   async getHeaders(req) {
-    // Get token from session
     const accessToken = req.session.etsyToken?.accessToken;
     
     if (!accessToken) {
       throw new Error('No Etsy access token found. Please authenticate first.');
     }
 
-    // Check if token is expired and needs refresh
     if (this.isTokenExpired(req.session.etsyToken)) {
       const refreshedToken = await this.refreshToken(req);
       req.session.etsyToken = refreshedToken;
@@ -52,6 +51,23 @@ export class EtsyService {
     };
   }
 
+  // API Requests
+  async makeRequest(req, endpoint, options = {}) {
+    const headers = await this.getHeaders(req);
+    const response = await fetch(`${ETSY_API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Etsy API error: ${response.status} ${response.statusText} - ${errorData.error}`);
+    }
+
+    return response.json();
+  }
+
+  // Order Fetching
   async fetchOrders(req, params = {}) {
     try {
       const shopId = req.session.etsyToken?.shopId;
@@ -59,68 +75,57 @@ export class EtsyService {
         return { count: 0, results: [] };
       }
 
-      const queryParams = new URLSearchParams(
-        Object.entries({
-          limit: '50',
-          offset: '0',
-          ...params
-        }).filter(([_, value]) => value !== undefined)
-      );
-
-      const response = await fetch(
-        `${ETSY_API_BASE}/application/shops/${shopId}/receipts?${queryParams}`,
-        {
-          method: 'GET',
-          headers: await this.getHeaders(req),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Etsy API error: ${response.status} ${response.statusText} - ${errorData.error}`);
-      }
-
-      const data = await response.json();
-      
-      console.log(data.results.length);
-      
-      // Fetch shipping addresses for each order
-      const ordersWithAddresses = await Promise.all(
-        data.results.map(async (order) => {
-          try {
-            const addressResponse = await fetch(
-              `${ETSY_API_BASE}/application/receipts/${order.receipt_id}?includes=shipping_address`,
-              {
-                method: 'GET',
-                headers: await this.getHeaders(req),
-              }
-            );
-
-            if (!addressResponse.ok) {
-              console.error(`Failed to fetch address for order ${order.receipt_id}`);
-              return order;
-            }
-
-            const addressData = await addressResponse.json();
-            return {
-              ...order,
-              shipping_address: addressData.shipping_address || {}
-            };
-          } catch (error) {
-            console.error(`Error fetching address for order ${order.receipt_id}:`, error);
-            return order;
-          }
-        })
-      );
-
-      console.log(ordersWithAddresses);
+      const queryParams = this.buildQueryParams(params);
+      const orders = await this.fetchOrdersData(req, shopId, queryParams);
+      const ordersWithAddresses = await this.fetchOrderAddresses(req, orders.results);
 
       return {
-        ...data,
+        ...orders,
         results: ordersWithAddresses
       };
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);
+    }
+  }
+
+  buildQueryParams(params) {
+    return new URLSearchParams(
+      Object.entries({
+        limit: '50',
+        offset: '0',
+        ...params
+      }).filter(([_, value]) => value !== undefined)
+    );
+  }
+
+  async fetchOrdersData(req, shopId, queryParams) {
+    return this.makeRequest(req, `/application/shops/${shopId}/receipts?${queryParams}`);
+  }
+
+  async fetchOrderAddresses(req, orders) {
+    const addressPromises = orders.map(order => this.fetchOrderAddress(req, order));
+    const results = await Promise.allSettled(addressPromises);
+    
+    return results.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return {
+          ...orders[index],
+          shipping_address: result.value.shipping_address || {}
+        };
+      }
+      console.error(`Failed to fetch address for order ${orders[index].receipt_id}:`, result.reason);
+      return orders[index];
+    });
+  }
+
+  async fetchOrderAddress(req, order) {
+    try {
+      return await this.makeRequest(
+        req,
+        `/application/receipts/${order.receipt_id}?includes=shipping_address`
+      );
+    } catch (error) {
+      throw new Error(`Failed to fetch address for order ${order.receipt_id}: ${error.message}`);
     }
   }
 }

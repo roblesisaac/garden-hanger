@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
-import { decode } from 'html-entities';
 import listingsModel from '../models/listings.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
@@ -98,13 +97,13 @@ export class EtsyService {
           ...order,
           _id: `orders:${formattedDate.replace(/:/g, '-')}_${random}`,
           shipping_address: {
-            name: decode(order.name || ''),
-            first_line: decode(order.first_line || ''),
-            second_line: decode(order.second_line || ''),
-            city: decode(order.city || ''),
-            state: decode(order.state || ''),
+            name: order.name || '',
+            first_line: order.first_line || '',
+            second_line: order.second_line || '',
+            city: order.city || '',
+            state: order.state || '',
             zip: order.zip || '',
-            formatted_address: decode(order.formatted_address || ''),
+            formatted_address: order.formatted_address || '',
             country_iso: order.country_iso || '',
             email: order.buyer_email || ''
           },

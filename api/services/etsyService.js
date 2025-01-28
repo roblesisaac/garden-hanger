@@ -55,6 +55,7 @@ export class EtsyService {
   async fetchOrders(req, params = {}) {
     try {
       const shopId = req.session.etsyToken?.shopId;
+      console.log('req.session.etsyToken::', req.session.etsyToken);
       console.log('shopId::', shopId);
       if (!shopId) {
         return { count: 0, results: [] }; // Return empty orders if no shop

@@ -11,7 +11,12 @@ export class EtsyAuthService {
     this.clientId = config.ETSY.API_KEY;
     this.clientSecret = config.ETSY.SHARED_SECRET;
     this.redirectUri = `${config.AMPT_URL}/api/etsy/auth/callback`;
-    this.scopes = ['transactions_r', 'listings_r', 'orders_r'];
+    this.scopes = [
+      'email_r',
+      'shops_r', 
+      'transactions_r',
+      'listings_r'
+    ];
   }
 
   // Generate code verifier for PKCE

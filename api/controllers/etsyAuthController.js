@@ -24,6 +24,11 @@ export const initiateAuth = async (req, res) => {
 
 export const handleCallback = async (req, res) => {
   try {
+    // Check for OAuth error response
+    if (req.query.error) {
+      throw new Error(`Etsy OAuth error: ${req.query.error} - ${req.query.error_description}`);
+    }
+
     const { code } = req.query;
     
     if (!code) {
@@ -59,6 +64,7 @@ export const handleCallback = async (req, res) => {
     
     res.redirect(returnUrl);
   } catch (error) {
+    console.error('Etsy auth callback error:', error);
     res.status(500).json({
       success: false,
       error: error.message

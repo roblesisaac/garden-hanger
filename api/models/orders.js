@@ -48,10 +48,6 @@ const orderSchema = {
     refunds: [Number],
     deliveredAt: String,
     shippingCost: Number,
-    label1: 'userid',
-    label2: 'stripeSessionId',
-    label3: 'orderEmail',
-    label4: 'status',
     orderSource: {
         type: String,
         enum: ['website', 'etsy']
@@ -59,7 +55,11 @@ const orderSchema = {
     etsyReceiptId: String,
     createdTimestamp: Number,
     updatedTimestamp: Number,
-    isShipped: Boolean
+    isShipped: Boolean,
+    label1: 'userid',
+    label2: 'stripeSessionId',
+    label3: 'orderEmail',
+    label4: 'status'
 }
 
 const orderModel = AmptModel('orders', orderSchema);

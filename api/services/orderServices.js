@@ -243,7 +243,7 @@ export async function syncEtsyOrders(req) {
 
     for (const etsyOrder of etsyOrders.results) {
       try {
-        const etsyOrderId = `orders:etsy_${etsyOrder.receipt_id}`;
+        const etsyOrderId = `orders:etsy_${etsyOrder._id}`;
         
         if (existingOrderIds.has(etsyOrderId)) {
           continue;

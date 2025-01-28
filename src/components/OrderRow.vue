@@ -56,8 +56,8 @@
           <h4 class="text-md font-semibold text-gray-700 mb-3">Order Items</h4>
           <ul class="space-y-2">
             <li v-for="item in orderData.orderItems" :key="item._id" class="text-sm bg-gray-50 p-2 rounded">
-                <router-link :to="'/products/' + item.sku.toLowerCase()" class="font-medium text-blue-600">
-                    {{ item.orderSource === 'etsy' ? item.sku : item.description }}
+                <router-link :to="'/products/' + (item.title || '').toLowerCase()" class="font-medium text-blue-600">
+                    {{ item.title }}
                 </router-link>
                 <span class="text-gray-500 ml-2">(Qty: {{ item.qty }})</span>
             </li>

@@ -81,6 +81,8 @@ export class EtsyService {
       // Instead of fetching addresses separately, include them in the initial request
       const ordersWithDetails = await this.fetchOrdersWithDetails(req, orders.results);
 
+      console.log('ordersWithDetails::', ordersWithDetails);
+
       return {
         ...orders,
         results: ordersWithDetails

@@ -98,10 +98,13 @@
                 </div>
             
             <!-- Admin Section -->
-            <div v-if="userStore.isAdmin" class="mt-8 space-y-4">
-                
+            <div v-if="userStore.isAdmin && !orderData.orderSource === 'etsy'" class="mt-8 space-y-4">
                 <!-- Admin Capture / Refund Buttons -->
-                <OrderPaymentManager :orderData="orderData" @payment-status-changed="handleUpdateOrder({ paymentStatus: $event })" />
+                <OrderPaymentManager 
+                    v-if="orderData.stripeSession"
+                    :orderData="orderData" 
+                    @payment-status-changed="handleUpdateOrder({ paymentStatus: $event })" 
+                />
                 
                 <!-- Label Image -->
                 <div v-if="orderData.purchasedLabelUrl" class="flex flex-col items-center">
@@ -169,11 +172,17 @@ const isEditingAddress = ref(false);
 const showCancelOrder = ref(false);
 
 const canUpdateAddress = computed(() => {
+    if (props.orderData.orderSource === 'etsy') {
+        return false; // Disable address updates for Etsy orders
+    }
     const { status } = props.orderData;
     return ['created', 'on_hold'].includes(status.toLowerCase());
 });
 
 const canPrintShippingLabel = computed(() => {
+    if (props.orderData.orderSource === 'etsy') {
+        return false; // Disable label printing for Etsy orders
+    }
     const { purchasedLabelUrl, paymentStatus } = props.orderData;
     const unacceptableStatuses = ['unpaid', 'failed'];
 

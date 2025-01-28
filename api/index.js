@@ -44,8 +44,8 @@ api.use('/', shippingRouter);
 api.use('/', dbRouter);
 api.use('/', orderRouter);
 api.use('/', auth0Router);
-api.use('/api/etsy/orders', orderRoutes);
-api.use('/api/etsy/auth', etsyAuthRoutes);
+api.use('/etsy/orders', orderRoutes);
+api.use('/etsy/auth', etsyAuthRoutes);
 
 api.use('/*', redirectJson);
 app.use(redirectHtml);

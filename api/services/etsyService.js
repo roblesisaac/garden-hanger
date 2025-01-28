@@ -82,6 +82,7 @@ export class EtsyService {
       }
 
       const data = await response.json();
+      console.log('data::', Object.keys(data));
       console.log(JSON.stringify(data.results.length, null, 2));
       return data;
     } catch (error) {

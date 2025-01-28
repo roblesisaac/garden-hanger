@@ -52,8 +52,8 @@ export default function useOrders() {
         try {
             const orders = await get(apiEndpoint);
             console.log('Retrieved orders:', orders);
+            
             orderItems.value = orders.map(order => {
-                // Add empty stripeSession for Etsy orders to prevent null reference errors
                 if (order.orderSource === 'etsy') {
                     return {
                         ...order,
@@ -63,7 +63,7 @@ export default function useOrders() {
                                     id: item._id,
                                     description: item.title,
                                     quantity: item.qty,
-                                    amount_total: 0 // Etsy orders handle pricing differently
+                                    amount_total: 0
                                 }))
                             }
                         }
@@ -79,8 +79,9 @@ export default function useOrders() {
                     new Date(b._id.split('_')[0]);
                 return dateB - dateA;
             });
-            console.log('Sorted orders:', orderItems.value);
-            return orders;
+            
+            console.log('Processed orders:', orderItems.value);
+            return orderItems.value;
         } catch (err) {
             console.error('Error fetching orders:', err);
             throw err;
@@ -116,13 +117,45 @@ export default function useOrders() {
     }
 
     async function updateOrder(orderId, updates) {
-        const updatedOrder = await put(`orders/${orderId}`, updates);
-
-        orderItems.value = orderItems.value.map(orderItem => 
-            orderItem._id === orderId 
-                ? { ...orderItem, ...updatedOrder } 
-                : orderItem
-        );
+        try {
+            const updatedOrder = await put(`orders/${orderId}`, updates);
+            
+            // Find the existing order
+            const existingOrder = orderItems.value.find(order => order._id === orderId);
+            
+            // Update orderItems while preserving stripeSession for non-Etsy orders
+            orderItems.value = orderItems.value.map(orderItem => {
+                if (orderItem._id === orderId) {
+                    if (orderItem.orderSource === 'etsy') {
+                        return {
+                            ...orderItem,
+                            ...updatedOrder,
+                            stripeSession: {
+                                line_items: {
+                                    data: orderItem.orderItems.map(item => ({
+                                        id: item._id,
+                                        description: item.title,
+                                        quantity: item.qty,
+                                        amount_total: 0
+                                    }))
+                                }
+                            }
+                        };
+                    } else {
+                        // For non-Etsy orders, preserve the original stripeSession
+                        return {
+                            ...orderItem,
+                            ...updatedOrder,
+                            stripeSession: existingOrder.stripeSession
+                        };
+                    }
+                }
+                return orderItem;
+            });
+        } catch (error) {
+            console.error('Error updating order:', error);
+            throw error;
+        }
     }
 
 

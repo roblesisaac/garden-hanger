@@ -49,7 +49,16 @@ export default function useOrders() {
     async function getOrders(apiEndpoint='orders') {
         try {
             const orders = await get(apiEndpoint);
-            orderItems.value = orders;
+            // Sort orders by date, handling both Etsy and website orders
+            orderItems.value = orders.sort((a, b) => {
+                const dateA = a.orderSource === 'etsy' ? 
+                    new Date(a.createdTimestamp * 1000) : 
+                    new Date(a._id.split('_')[0]);
+                const dateB = b.orderSource === 'etsy' ? 
+                    new Date(b.createdTimestamp * 1000) : 
+                    new Date(b._id.split('_')[0]);
+                return dateB - dateA;
+            });
             return orders;
         } catch (err) {
             throw err;

@@ -212,9 +212,14 @@ function sortByMostRecent(orders) {
     }
 
     return orders.sort((a, b) => {
-        const dateA = extractDateFromId(a._id);
-        const dateB = extractDateFromId(b._id);
-
+        // For Etsy orders, use createdTimestamp
+        if (a.orderSource === 'etsy' && b.orderSource === 'etsy') {
+            return b.createdTimestamp - a.createdTimestamp;
+        }
+        // For website orders, use the existing date extraction
+        const dateA = a.orderSource === 'etsy' ? new Date(a.createdTimestamp * 1000) : extractDateFromId(a._id);
+        const dateB = b.orderSource === 'etsy' ? new Date(b.createdTimestamp * 1000) : extractDateFromId(b._id);
+        
         return dateB.getTime() - dateA.getTime();
     });
 }
@@ -239,12 +244,16 @@ export async function syncEtsyOrders(req) {
       try {
         const etsyOrderId = `orders:etsy_${etsyOrder.receipt_id}`;
         
-        // Check if order already exists in our set
         if (existingOrderIds.has(etsyOrderId)) {
-          continue; // Skip if already exists
+          continue;
         }
 
-        // Transform Etsy order to our format
+        // Get formatted address parts
+        const addressParts = etsyOrder.formatted_address?.split('\n') || [];
+        const [street = '', cityStateZip = ''] = addressParts;
+        const [city = '', stateZip = ''] = cityStateZip.split(',').map(s => s.trim());
+        const [state = '', zip = ''] = stateZip.split(' ').map(s => s.trim());
+
         const orderData = {
           _id: etsyOrderId,
           orderId: etsyOrder.receipt_id.toString(),
@@ -254,10 +263,10 @@ export async function syncEtsyOrders(req) {
           shippingAddress: {
             customerName: etsyOrder.name || '',
             email: etsyOrder.buyer_email || '',
-            street: etsyOrder.first_line || '',
-            city: etsyOrder.city || '',
-            state: etsyOrder.state || '',
-            zipCode: etsyOrder.zip || ''
+            street: street || etsyOrder.first_line || '',
+            city: city || etsyOrder.city || '',
+            state: state || etsyOrder.state || '',
+            zipCode: zip || etsyOrder.zip || ''
           },
           orderItems: etsyOrder.transactions.map(transaction => ({
             productsInListing: [{
@@ -276,14 +285,18 @@ export async function syncEtsyOrders(req) {
           isShipped: etsyOrder.is_shipped,
           notes: etsyOrder.message_from_buyer || '',
           trackingUrl: etsyOrder.shipments?.[0]?.tracking_url || '',
+          shippingCost: etsyOrder.total_shipping_cost?.amount || 0,
+          deliveredAt: etsyOrder.status === 'Completed' ? new Date(etsyOrder.updated_timestamp * 1000).toISOString() : '',
           label1: 'userid',
           label2: 'etsyReceiptId',
           label3: 'orderEmail',
           label4: 'status',
           refunds: []
         };
-        
+
+        console.log('Saving Etsy order:', orderData);
         const savedOrder = await Orders.save(orderData);
+        console.log('Saved order:', savedOrder);
         savedOrders.push(savedOrder);
       } catch (error) {
         console.error('Error saving order:', error);

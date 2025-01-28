@@ -248,8 +248,6 @@ export async function syncEtsyOrders(req) {
           continue;
         }
 
-        console.log('etsyOrder::', etsyOrder);
-
         // Get formatted address parts
         const addressParts = etsyOrder.formatted_address?.split('\n') || [];
         const [street = '', cityStateZip = ''] = addressParts;
@@ -296,9 +294,7 @@ export async function syncEtsyOrders(req) {
           refunds: []
         };
 
-        console.log('Saving Etsy order:', orderData);
         const savedOrder = await Orders.save(orderData);
-        console.log('Saved order:', savedOrder);
         savedOrders.push(savedOrder);
       } catch (error) {
         console.error('Error saving order:', error);

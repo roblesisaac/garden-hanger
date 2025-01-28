@@ -78,39 +78,25 @@ export class EtsyService {
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
       
-      // Fetch shipping details for each order
-      const ordersWithDetails = await Promise.all(
-        orders.results.map(async (order) => {
-          try {
-            const orderDetails = await this.makeRequest(
-              req,
-              `/application/shops/${shopId}/receipts/${order.receipt_id}`
-            );
-            console.log(orderDetails);
-            return {
-              ...order,
-              ...orderDetails, // Merge order details with original order
-              shipping_address: {
-                name: orderDetails.name || '',
-                first_line: orderDetails.first_line || '',
-                second_line: orderDetails.second_line || '',
-                city: orderDetails.city || '',
-                state: orderDetails.state || '',
-                zip: orderDetails.zip || '',
-                formatted_address: orderDetails.formatted_address || '',
-                country_iso: orderDetails.country_iso || ''
-              }
-            };
-          } catch (error) {
-            console.error(`Failed to fetch details for order ${order.receipt_id}:`, error);
-            return order;
-          }
-        })
-      );
+      const transformedOrders = orders.results.map(order => ({
+        ...order,
+        shipping_address: {
+          name: order.name || '',
+          first_line: '', // Reserved for future Etsy preferred partnership
+          second_line: '',
+          city: '',
+          state: '',
+          zip: '',
+          formatted_address: '',
+          country_iso: '',
+          // Include buyer email if available since we can access that
+          email: order.buyer_email || ''
+        }
+      }));
 
       return {
         ...orders,
-        results: ordersWithDetails
+        results: transformedOrders
       };
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);
@@ -122,6 +108,7 @@ export class EtsyService {
       Object.entries({
         limit: '50',
         offset: '0',
+        // Add any additional fields we want to include in the future
         ...params
       }).filter(([_, value]) => value !== undefined)
     );
@@ -129,6 +116,11 @@ export class EtsyService {
 
   async fetchOrdersData(req, shopId, queryParams) {
     return this.makeRequest(req, `/application/shops/${shopId}/receipts?${queryParams}`);
+  }
+
+  // Reserved for future Etsy preferred partnership implementation
+  async fetchOrderDetails(req, shopId, orderId) {
+    return this.makeRequest(req, `/application/shops/${shopId}/receipts/${orderId}`);
   }
 }
 

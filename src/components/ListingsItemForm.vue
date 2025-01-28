@@ -4,6 +4,8 @@
         <!-- Title -->
         <EditPropVue :data="listingDataLocal" prop="title" />
 
+        <!-- Etsy Lookup -->
+        <EditPropVue :data="listingDataLocal" prop="etsyLookup" />
         <!-- Line -->
         <EditPropVue :data="listingDataLocal" prop="line" />
   

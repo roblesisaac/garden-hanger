@@ -82,7 +82,6 @@ export default function useOrders() {
                 const dateB = new Date(b._id.split('_')[0])
                 return dateB - dateA;
             });
-            console.log(orderItems.value)
             return orderItems.value;
         } catch (err) {
             console.error('Error fetching orders:', err);

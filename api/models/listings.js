@@ -2,6 +2,7 @@ import AmptModel from 'ampt-model';
 
 const listingSchema = {
     title: String,
+    etsyLookup: String,
     line: String,
     description: String,
     coverPhoto: String,

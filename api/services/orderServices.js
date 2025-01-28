@@ -263,15 +263,7 @@ export async function syncEtsyOrders(req) {
             zipCode: etsyOrder.zip || '',
             country: etsyOrder.country_iso || ''
           },
-          orderItems: etsyOrder.transactions.map(transaction => ({
-            productsInListing: [{
-              sku: transaction.sku || '',
-              qty: transaction.quantity
-            }],
-            qty: transaction.quantity,
-            title: transaction.title,
-            _id: `etsy_${transaction.transaction_id}`
-          })),
+          orderItems: etsyOrder.orderItems,
           totalPrice: etsyOrder.total_price.amount,
           status: mapEtsyStatus(etsyOrder.status),
           paymentStatus: etsyOrder.is_paid ? 'paid' : 'unpaid',

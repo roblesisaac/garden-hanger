@@ -49,39 +49,26 @@ export const handleCallback = async (req, res) => {
     }
 
     const tokenData = await etsyAuthService.getAccessToken(code, codeVerifier);
+    const userInfo = await etsyAuthService.getUserInfo(tokenData.accessToken);
+
+    // Store token data and user info in session
+    req.session.etsyToken = {
+      accessToken: tokenData.accessToken,
+      refreshToken: tokenData.refreshToken,
+      expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000)),
+      userId: userInfo.userId,
+      shopId: userInfo.shopId // This might be undefined if user has no shop
+    };
+
+    // Clean up code verifier
+    delete req.session.etsyCodeVerifier;
+    await req.session.save();
+
+    // Redirect back to original page if set
+    const returnUrl = req.session.etsyAuthReturnUrl || '/my-account';
+    delete req.session.etsyAuthReturnUrl;
     
-    try {
-      // Get the shop ID
-      const shopId = await etsyAuthService.getUserShops(tokenData.accessToken);
-
-      // Store token data and shop ID in session
-      req.session.etsyToken = {
-        accessToken: tokenData.accessToken,
-        refreshToken: tokenData.refreshToken,
-        expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000)),
-        shopId: shopId
-      };
-
-      // Clean up code verifier
-      delete req.session.etsyCodeVerifier;
-      await req.session.save();
-
-      // Redirect back to original page if set
-      const returnUrl = req.session.etsyAuthReturnUrl || '/my-account';
-      delete req.session.etsyAuthReturnUrl;
-      
-      res.redirect(returnUrl);
-    } catch (shopError) {
-      // If we fail to get shop ID, we should still save the tokens
-      req.session.etsyToken = {
-        accessToken: tokenData.accessToken,
-        refreshToken: tokenData.refreshToken,
-        expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000))
-      };
-      await req.session.save();
-      
-      throw shopError;
-    }
+    res.redirect(returnUrl);
   } catch (error) {
     console.error('Etsy auth callback error:', error);
     res.status(500).json({

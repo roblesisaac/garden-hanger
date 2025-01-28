@@ -56,7 +56,7 @@ export class EtsyService {
     try {
       const shopId = req.session.etsyToken?.shopId;
       if (!shopId) {
-        throw new Error('No shop ID found in session');
+        return { count: 0, results: [] }; // Return empty orders if no shop
       }
 
       const queryParams = new URLSearchParams({

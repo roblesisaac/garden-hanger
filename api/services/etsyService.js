@@ -113,10 +113,7 @@ export class EtsyService {
           orderItems: order.transactions.map(item => ({
             _id: `etsy_${item.transaction_id}`,
             title: item.sku,
-            productsInListing: [{
-              sku: item.sku || '',
-              qty: item.quantity || 1
-            }],
+            productsInListing: (listings.find(listing => listing.etsyLookup === item.sku) || {}).productsInListing,
             qty: item.quantity || 1
           }))
         };

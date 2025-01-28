@@ -247,11 +247,12 @@ export async function syncEtsyOrders(req) {
 
     for (const etsyOrder of etsyOrders.results) {
       try {
-        const etsyOrderId = etsyOrder.receipt_id;
-        
-        if (existingOrderIds.has(etsyOrderId)) {
+        if (existingOrderIds.has(etsyOrder.receipt_id)) {
+            console.log('skipping', etsyOrder.receipt_id);
           continue;
         }
+
+        console.log('etsyOrder', etsyOrder);
 
         const orderData = {
           _id: etsyOrder._id,

@@ -56,10 +56,9 @@ export class EtsyService {
     try {
       const shopId = req.session.etsyToken?.shopId;
       if (!shopId) {
-        return { count: 0, results: [] }; // Return empty orders if no shop
+        return { count: 0, results: [] };
       }
 
-      // Filter out undefined values and set defaults
       const queryParams = new URLSearchParams(
         Object.entries({
           limit: '50',
@@ -76,15 +75,46 @@ export class EtsyService {
         }
       );
 
-     if (!response.ok) {
+      if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Etsy API error: ${response.status} ${response.statusText} - ${errorData.error}`);
       }
 
       const data = await response.json();
-      console.log('data::', Object.keys(data));
-      console.log(JSON.stringify(data.results[0], null, 2));
-      return data;
+      
+      // Fetch shipping addresses for each order
+      const ordersWithAddresses = await Promise.all(
+        data.results.map(async (order) => {
+          try {
+            const addressResponse = await fetch(
+              `${ETSY_API_BASE}/application/receipts/${order.receipt_id}?includes=shipping_address`,
+              {
+                method: 'GET',
+                headers: await this.getHeaders(req),
+              }
+            );
+
+            if (!addressResponse.ok) {
+              console.error(`Failed to fetch address for order ${order.receipt_id}`);
+              return order;
+            }
+
+            const addressData = await addressResponse.json();
+            return {
+              ...order,
+              shipping_address: addressData.shipping_address || {}
+            };
+          } catch (error) {
+            console.error(`Error fetching address for order ${order.receipt_id}:`, error);
+            return order;
+          }
+        })
+      );
+
+      return {
+        ...data,
+        results: ordersWithAddresses
+      };
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);
     }

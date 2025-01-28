@@ -263,10 +263,10 @@ export async function syncEtsyOrders(req) {
           shippingAddress: {
             customerName: etsyOrder.name || '',
             email: etsyOrder.buyer_email || '',
-            street: street || etsyOrder.first_line || '',
-            city: city || etsyOrder.city || '',
-            state: state || etsyOrder.state || '',
-            zipCode: zip || etsyOrder.zip || ''
+            street: etsyOrder.shipping_address?.first_line || '',
+            city: etsyOrder.shipping_address?.city || '',
+            state: etsyOrder.shipping_address?.state || '',
+            zipCode: etsyOrder.shipping_address?.zip || ''
           },
           orderItems: etsyOrder.transactions.map(transaction => ({
             productsInListing: [{

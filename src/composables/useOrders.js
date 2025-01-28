@@ -6,6 +6,7 @@ const { get, post, put } = useApi();
 const { createShipment } = useShipping();
 
 const orderItems = ref([]);
+const loading = ref(false);
 
 export default function useOrders() {
 
@@ -47,9 +48,10 @@ export default function useOrders() {
     }
 
     async function getOrders(apiEndpoint='orders') {
+        loading.value = true;
         try {
             const orders = await get(apiEndpoint);
-            // Sort orders by date, handling both Etsy and website orders
+            console.log('Retrieved orders:', orders);
             orderItems.value = orders.sort((a, b) => {
                 const dateA = a.orderSource === 'etsy' ? 
                     new Date(a.createdTimestamp * 1000) : 
@@ -59,9 +61,13 @@ export default function useOrders() {
                     new Date(b._id.split('_')[0]);
                 return dateB - dateA;
             });
+            console.log('Sorted orders:', orderItems.value);
             return orders;
         } catch (err) {
+            console.error('Error fetching orders:', err);
             throw err;
+        } finally {
+            loading.value = false;
         }
     }
 
@@ -103,6 +109,7 @@ export default function useOrders() {
 
 
     return  {
+        loading,
         captureOrder,
         cancelOrder,
         createLabel,

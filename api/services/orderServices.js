@@ -242,12 +242,10 @@ export async function syncEtsyOrders(req) {
     console.log('existingOrders', existingOrders.length);
     const existingOrderIds = new Set(existingOrders.map(order => order.etsyReceiptId));
 
-    console.log('existingOrderIds', existingOrderIds);
-
 
     for (const etsyOrder of etsyOrders.results) {
       try {
-        if (existingOrderIds.has(etsyOrder.receipt_id)) {
+        if (existingOrderIds.has(etsyOrder.receipt_id.toSring())) {
           continue;
         }
 

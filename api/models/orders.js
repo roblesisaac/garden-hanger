@@ -38,7 +38,7 @@ const orderSchema = {
     trackingUrl: String,
     status: {
         type: String,
-        enum: [ 'created', 'on_hold', 'processing', 'cancelled', 'shipped', 'delivered', 'returned' ]
+        enum: ['created', 'on_hold', 'processing', 'cancelled', 'shipped', 'delivered', 'returned']
     },
     cancellationReason: String,
     paymentStatus: {
@@ -51,7 +51,15 @@ const orderSchema = {
     label1: 'userid',
     label2: 'stripeSessionId',
     label3: 'orderEmail',
-    label4: 'status'
+    label4: 'status',
+    orderSource: {
+        type: String,
+        enum: ['website', 'etsy']
+    },
+    etsyReceiptId: String,
+    createdTimestamp: Number,
+    updatedTimestamp: Number,
+    isShipped: Boolean
 }
 
 const orderModel = AmptModel('orders', orderSchema);

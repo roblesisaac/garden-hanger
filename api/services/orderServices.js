@@ -6,6 +6,7 @@ import config from '../config/environment';
 import orderCreatedTemplate from '../emails/order-created-template';
 import orderShippedTemplate from '../emails/order-shipped-template';
 import * as StripeService from './stripeServices';
+import etsyService from './etsyService.js';
 
 export async function captureOrder(orderId) {
     const orderToCapture = await Orders.findOne(orderId);
@@ -222,4 +223,97 @@ export async function updateOrder(orderId, updates) {
     const updatedOrder = await Orders.update(orderId, updates);
 
     return updatedOrder;
+}
+
+export async function syncEtsyOrders(req) {
+  try {
+    const etsyOrders = await etsyService.fetchOrders(req);
+    const savedOrders = [];
+    const errors = [];
+
+    for (const etsyOrder of etsyOrders.results) {
+      try {
+        // Check if order already exists
+        const existingOrder = await Orders.findOne(`etsy_${etsyOrder.receipt_id}`);
+        if (existingOrder) {
+          continue; // Skip if already exists
+        }
+
+        // Transform Etsy order to our format
+        const orderData = {
+          _id: `etsy_${etsyOrder.receipt_id}`,
+          orderId: etsyOrder.receipt_id.toString(),
+          userid: req.session.etsyToken.userId,
+          orderSource: 'etsy',
+          etsyReceiptId: etsyOrder.receipt_id,
+          shippingAddress: {
+            customerName: etsyOrder.name || '',
+            email: etsyOrder.buyer_email || '',
+            street: etsyOrder.first_line || '',
+            city: etsyOrder.city || '',
+            state: etsyOrder.state || '',
+            zipCode: etsyOrder.zip || ''
+          },
+          orderItems: etsyOrder.transactions.map(transaction => ({
+            productsInListing: [{
+              sku: transaction.sku || '',
+              qty: transaction.quantity
+            }],
+            qty: transaction.quantity,
+            title: transaction.title,
+            _id: `etsy_${transaction.transaction_id}`
+          })),
+          totalPrice: etsyOrder.total_price.amount,  // Remove division and let schema handle it
+          status: mapEtsyStatus(etsyOrder.status),
+          paymentStatus: etsyOrder.is_paid ? 'paid' : 'unpaid',
+          createdTimestamp: etsyOrder.created_timestamp,
+          updatedTimestamp: etsyOrder.updated_timestamp,
+          isShipped: etsyOrder.is_shipped,
+          notes: etsyOrder.message_from_buyer || '',
+          trackingUrl: etsyOrder.shipments?.[0]?.tracking_url || '',
+          label1: 'userid',
+          label2: 'etsyReceiptId',
+          label3: 'orderEmail',
+          label4: 'status'
+        };
+
+        console.log('Saving Etsy order:', orderData);
+        const savedOrder = await Orders.save(orderData);
+        console.log('Saved order:', savedOrder);
+        savedOrders.push(savedOrder);
+      } catch (error) {
+        console.error('Error saving order:', error);
+        errors.push({
+          orderId: etsyOrder.receipt_id,
+          error: error.message
+        });
+      }
+    }
+
+    // Update last sync time
+    req.session.lastEtsySync = new Date().toISOString();
+    await req.session.save();
+
+    return {
+      success: true,
+      syncedOrders: savedOrders.length,
+      totalOrders: etsyOrders.count,
+      errors: errors.length > 0 ? errors : undefined,
+      savedOrders // Include the saved orders in response
+    };
+  } catch (error) {
+    console.error('Sync error:', error);
+    throw new Error(`Failed to sync Etsy orders: ${error.message}`);
+  }
+}
+
+// Helper function to map Etsy status to our status
+function mapEtsyStatus(etsyStatus) {
+  const statusMap = {
+    'Paid': 'processing',
+    'Completed': 'delivered',
+    'Canceled': 'cancelled',
+    'Shipped': 'shipped'
+  };
+  return statusMap[etsyStatus] || 'created';
 }

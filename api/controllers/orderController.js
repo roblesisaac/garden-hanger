@@ -1,19 +1,10 @@
-import etsyService from '../services/etsyService.js';
-import { requireEtsyAuth } from '../controllers/etsyAuthController.js';
+import { syncEtsyOrders } from '../services/orderServices.js';
+import { requireEtsyAuth } from './etsyAuthController.js';
 
 export const syncOrders = [requireEtsyAuth, async (req, res) => {
   try {
-    const { limit, offset } = req.query;
-    const orders = await etsyService.fetchOrders(req, { limit, offset });
-    
-    // Store last sync time
-    req.session.lastEtsySync = new Date().toISOString();
-    await req.session.save();
-    
-    res.status(200).json({
-      success: true,
-      data: orders
-    });
+    const result = await syncEtsyOrders(req);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
       success: false,

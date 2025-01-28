@@ -50,6 +50,7 @@
   import useOrders from '../composables/useOrders';
   
   const { orderItems, getOrders } = useOrders();
+  const userStore = useUserStore();
   
   async function fetchOrders() {
     try {

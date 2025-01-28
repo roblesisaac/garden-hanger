@@ -55,6 +55,7 @@ export class EtsyService {
   async fetchOrders(req, params = {}) {
     try {
       const shopId = req.session.etsyToken?.shopId;
+      console.log('shopId::', shopId);
       if (!shopId) {
         return { count: 0, results: [] }; // Return empty orders if no shop
       }
@@ -79,6 +80,8 @@ export class EtsyService {
       }
 
       const data = await response.json();
+      console.log('orders');
+      console.log(data);
       return data;
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);

@@ -51,6 +51,8 @@ export const handleCallback = async (req, res) => {
     const tokenData = await etsyAuthService.getAccessToken(code, codeVerifier);
     const userInfo = await etsyAuthService.getUserInfo(tokenData.accessToken);
 
+    console.log('userInfo::', userInfo);
+
     // Store token data and user info in session
     req.session.etsyToken = {
       accessToken: tokenData.accessToken,

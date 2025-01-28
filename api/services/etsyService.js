@@ -74,7 +74,7 @@ export class EtsyService {
         }
       );
 
-      console.log('response::', response);
+      console.log(`response okay ${response.ok}::`, response);
 
       if (!response.ok) {
         throw new Error(`Etsy API error: ${response.status} ${response.statusText}`);

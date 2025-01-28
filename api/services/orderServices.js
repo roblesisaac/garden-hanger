@@ -282,10 +282,8 @@ export async function syncEtsyOrders(req) {
           label4: 'status',
           refunds: []
         };
-
-        console.log('Saving Etsy order:', orderData);
+        
         const savedOrder = await Orders.save(orderData);
-        console.log('Saved order:', savedOrder);
         savedOrders.push(savedOrder);
       } catch (error) {
         console.error('Error saving order:', error);

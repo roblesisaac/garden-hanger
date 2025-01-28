@@ -51,7 +51,6 @@ export default function useOrders() {
         loading.value = true;
         try {
             const orders = await get(apiEndpoint);
-            console.log('Retrieved orders:', orders);
             
             orderItems.value = orders.map(order => {
                 if (order.orderSource === 'etsy') {
@@ -79,9 +78,6 @@ export default function useOrders() {
                     new Date(b._id.split('_')[0]);
                 return dateB - dateA;
             });
-            
-            console.log('Processed orders:', orderItems.value);
-            console.log('orderItems.value::', orderItems.value);
             return orderItems.value;
         } catch (err) {
             console.error('Error fetching orders:', err);

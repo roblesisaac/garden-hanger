@@ -83,7 +83,7 @@
         </div>
         
         <!-- Cancel Order Component -->
-        <div v-if="canUpdateAddress && orderData.orderSource !== 'etsy'">
+        <div v-if="canUpdateAddress">
           <OrderRowCancelOrder 
             :orderData="orderData"
             @close="showCancelOrder = false"
@@ -99,7 +99,7 @@
         </div>
       
         <!-- Admin Section -->
-        <div v-if="userStore.isAdmin && orderData.orderSource !== 'etsy'" class="mt-8 space-y-4">
+        <div v-if="userStore.isAdmin class="mt-8 space-y-4">
           <!-- Admin Capture / Refund Buttons -->
           <OrderPaymentManager 
             v-if="orderData.stripeSession"
@@ -164,17 +164,11 @@ const isEditingAddress = ref(false);
 const showCancelOrder = ref(false);
 
 const canUpdateAddress = computed(() => {
-    if (props.orderData.orderSource === 'etsy') {
-        return false; // Disable address updates for Etsy orders
-    }
     const { status } = props.orderData;
     return ['created', 'on_hold'].includes(status.toLowerCase());
 });
 
 const canPrintShippingLabel = computed(() => {
-    if (props.orderData.orderSource === 'etsy') {
-        return false; // Disable label printing for Etsy orders
-    }
     const { purchasedLabelUrl, paymentStatus } = props.orderData;
     const unacceptableStatuses = ['unpaid', 'failed'];
 

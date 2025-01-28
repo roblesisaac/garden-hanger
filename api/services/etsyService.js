@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import etsyAuthService from './etsyAuthService.js';
 import config from '../config/environment.js';
 import { decode } from 'html-entities';
-import generateDate from '../utils/amptModel/utils/generate-date.js';
 
 const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
@@ -85,7 +84,7 @@ export class EtsyService {
         console.log('order.created_timestamp', order.created_timestamp);
         const orderDate = new Date(order.created_timestamp * 1000).toISOString();
         const random = Math.random().toString(16).substring(2);
-        const dateForId = `${generateDate(orderDate.replace(/[:]/g, '-'))}_${random}`;
+        const dateForId = `${orderDate.replace(/[:]/g, '-')}_${random}`;
         return {
           ...order,
           _id: dateForId, // Add formatted date as _id for consistency

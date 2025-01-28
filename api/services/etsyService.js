@@ -108,7 +108,7 @@ export class EtsyService {
           },
           orderItems: order.transactions.map(item => ({
             _id: `etsy_${item.transaction_id}`,
-            title: decode(item.title || ''),
+            title: item.sku,
             productsInListing: [{
               sku: item.sku || '',
               qty: item.quantity || 1

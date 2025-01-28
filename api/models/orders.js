@@ -4,12 +4,12 @@ import { encrypt, decrypt } from '../utils/encryption';
 
 const orderSchema = {
     orderId: {
-        set: () => generateRandomNumber()
+        set: (val) => val || generateRandomNumber()
     },
     userid: String,
     stripeSessionId: {
-        set: encrypt,
-        get: decrypt
+        set: (val) => val ? encrypt(val) : null,
+        get: (val) => val ? decrypt(val) : null
     },
     shippingAddress: {
         customerName: String,

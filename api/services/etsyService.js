@@ -83,13 +83,19 @@ export class EtsyService {
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp
         const orderDate = new Date(order.created_timestamp * 1000);
-        const isoDate = orderDate.toISOString().split('.')[0] + 'Z'; // Remove milliseconds
-        const formattedDate = generateDate(isoDate);
-        const random = Math.random().toString(16).slice(2, 14); // Match length of existing random strings
+        const year = orderDate.getUTCFullYear();
+        const month = String(orderDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(orderDate.getUTCDate()).padStart(2, '0');
+        const hours = String(orderDate.getUTCHours()).padStart(2, '0');
+        const minutes = String(orderDate.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(orderDate.getUTCSeconds()).padStart(2, '0');
+        
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+        const random = Math.random().toString(16).slice(2, 14);
 
         return {
           ...order,
-          _id: `orders:${formattedDate}_${random}`,
+          _id: `orders:${formattedDate.replace(/:/g, '-')}_${random}`,
           shipping_address: {
             name: decode(order.name || ''),
             first_line: decode(order.first_line || ''),

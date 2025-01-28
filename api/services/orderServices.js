@@ -240,17 +240,13 @@ export async function syncEtsyOrders(req) {
     // Get all existing Etsy orders first
     const existingOrders = await Orders.findAll({ orderSource: 'etsy' });
     console.log('existingOrders', existingOrders.length);
-    const existingOrderIds = new Set(existingOrders.map(order => order.orderId));
+    const existingOrderIds = new Set(existingOrders.map(order => order.receipt_id));
 
-    console.log('etsyOrders', etsyOrders.results[0]);
     for (const etsyOrder of etsyOrders.results) {
       try {
-        const etsyOrderId = `${etsyOrder.orderId}`;
-
-        console.log(etsyOrderId);
+        const etsyOrderId = etsyOrder.receipt_id;
         
         if (existingOrderIds.has(etsyOrderId)) {
-            console.log('skipping', etsyOrderId);
           continue;
         }
 

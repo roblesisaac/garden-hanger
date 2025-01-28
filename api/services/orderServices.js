@@ -249,12 +249,6 @@ export async function syncEtsyOrders(req) {
           continue;
         }
 
-        // Get formatted address parts
-        const addressParts = etsyOrder.formatted_address?.split('\n') || [];
-        const [street = '', cityStateZip = ''] = addressParts;
-        const [city = '', stateZip = ''] = cityStateZip.split(',').map(s => s.trim());
-        const [state = '', zip = ''] = stateZip.split(' ').map(s => s.trim());
-
         const orderData = {
           _id: etsyOrderId,
           orderId: etsyOrder.receipt_id.toString(),
@@ -264,10 +258,11 @@ export async function syncEtsyOrders(req) {
           shippingAddress: {
             customerName: etsyOrder.name || '',
             email: etsyOrder.buyer_email || '',
-            street: etsyOrder.shipping_address?.first_line || '',
-            city: etsyOrder.shipping_address?.city || '',
-            state: etsyOrder.shipping_address?.state || '',
-            zipCode: etsyOrder.shipping_address?.zip || ''
+            street: etsyOrder.first_line || '',
+            city: etsyOrder.city || '',
+            state: etsyOrder.state || '',
+            zipCode: etsyOrder.zip || '',
+            country: etsyOrder.country_iso || ''
           },
           orderItems: etsyOrder.transactions.map(transaction => ({
             productsInListing: [{

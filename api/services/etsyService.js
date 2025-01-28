@@ -77,11 +77,13 @@ export class EtsyService {
 
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
-      const ordersWithAddresses = await this.fetchOrderAddresses(req, orders.results);
+      
+      // Instead of fetching addresses separately, include them in the initial request
+      const ordersWithDetails = await this.fetchOrdersWithDetails(req, orders.results);
 
       return {
         ...orders,
-        results: ordersWithAddresses
+        results: ordersWithDetails
       };
     } catch (error) {
       throw new Error(`Failed to fetch Etsy orders: ${error.message}`);
@@ -93,6 +95,7 @@ export class EtsyService {
       Object.entries({
         limit: '50',
         offset: '0',
+        includes: 'Shipping',  // Add this to get shipping info in initial request
         ...params
       }).filter(([_, value]) => value !== undefined)
     );
@@ -102,31 +105,25 @@ export class EtsyService {
     return this.makeRequest(req, `/application/shops/${shopId}/receipts?${queryParams}`);
   }
 
-  async fetchOrderAddresses(req, orders) {
-    const addressPromises = orders.map(order => this.fetchOrderAddress(req, order));
-    const results = await Promise.allSettled(addressPromises);
-    
-    return results.map((result, index) => {
-      if (result.status === 'fulfilled') {
-        return {
-          ...orders[index],
-          shipping_address: result.value.shipping_address || {}
-        };
-      }
-      console.error(`Failed to fetch address for order ${orders[index].receipt_id}:`, result.reason);
-      return orders[index];
-    });
-  }
+  async fetchOrdersWithDetails(req, orders) {
+    return orders.map(order => {
+      // Extract shipping address from the order data directly
+      const shippingAddress = {
+        name: order.name || '',
+        first_line: order.first_line || '',
+        second_line: order.second_line || '',
+        city: order.city || '',
+        state: order.state || '',
+        zip: order.zip || '',
+        formatted_address: order.formatted_address || '',
+        country_iso: order.country_iso || '',
+      };
 
-  async fetchOrderAddress(req, order) {
-    try {
-      return await this.makeRequest(
-        req,
-        `/application/receipts/${order.receipt_id}?includes=shipping_address`
-      );
-    } catch (error) {
-      throw new Error(`Failed to fetch address for order ${order.receipt_id}: ${error.message}`);
-    }
+      return {
+        ...order,
+        shipping_address: shippingAddress
+      };
+    });
   }
 }
 

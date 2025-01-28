@@ -251,7 +251,7 @@ export async function syncEtsyOrders(req) {
 
         const orderData = {
           _id: `orders:${etsyOrder._id}`,
-          orderId: etsyOrder.receipt_id.toString(),
+          orderId: String(etsyOrder.receipt_id),
           userid: req.session.etsyToken.userId,
           orderSource: 'etsy',
           etsyReceiptId: etsyOrder.receipt_id,

@@ -19,12 +19,6 @@ export default class CustomStore extends session.Store {
     try {
       const key = this.prefix + sessionId;
       const sessionData = await data.get(key);
-      
-      console.log('Session get:', { 
-        sessionId, 
-        hasSession: !!sessionData,
-        key
-      });
 
       if (!sessionData) {
         return callback(null, null);
@@ -39,7 +33,6 @@ export default class CustomStore extends session.Store {
       
       callback(null, sess);
     } catch (error) {
-      console.error('Session get error:', error);
       callback(error);
     }
   }
@@ -48,24 +41,16 @@ export default class CustomStore extends session.Store {
     try {
       const key = this.prefix + sessionId;
       
-      // Ensure proper date objects
       if (session.cookie) {
         session.cookie.expires = new Date(session.cookie.expires);
       }
       
       const expires = this.getExpiresValue(session);
       const payload = JSON.stringify({...session, expires});
-      
-      console.log('Session set:', { 
-        sessionId, 
-        key,
-        expires: new Date(expires * 1000)
-      });
 
       await data.set(key, payload);
       callback(null);
     } catch (error) {
-      console.error('Session set error:', error);
       callback(error);
     }
   }

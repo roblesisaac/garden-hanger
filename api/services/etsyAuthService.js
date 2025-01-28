@@ -125,11 +125,13 @@ export class EtsyAuthService {
         headers: {
           'x-api-key': this.clientId,
           'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json'
         },
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to get user shops: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(`Failed to get user shops: ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();
@@ -138,9 +140,10 @@ export class EtsyAuthService {
       }
 
       // Return the first shop's ID
-      return data.shops[0].shop_id;
+      return data.shops[0].shop_id.toString();
     } catch (error) {
-      throw new Error(`Failed to get shop ID: ${error.message}`);
+      console.error('Get user shops error:', error);
+      throw new Error(`Failed to get user shops: ${error.message}`);
     }
   }
 }

@@ -37,53 +37,51 @@ export const handleCallback = async (req, res) => {
       throw new Error(`Etsy OAuth error: ${req.query.error} - ${req.query.error_description}`);
     }
 
-    const { code, state } = req.query;
+    const { code } = req.query;
     
     if (!code) {
       throw new Error('No authorization code received');
     }
 
-    // Get code verifier from session
     const codeVerifier = req.session.etsyCodeVerifier;
-    console.log('Session data:', {
-      sessionId: req.sessionID,
-      hasCodeVerifier: !!codeVerifier,
-      sessionContent: req.session
-    });
-
     if (!codeVerifier) {
       throw new Error('No code verifier found in session. Session may have expired.');
     }
 
     const tokenData = await etsyAuthService.getAccessToken(code, codeVerifier);
     
-    // Get the shop ID
-    const shopId = await etsyAuthService.getUserShops(tokenData.accessToken);
+    try {
+      // Get the shop ID
+      const shopId = await etsyAuthService.getUserShops(tokenData.accessToken);
 
-    // Store token data and shop ID in session
-    req.session.etsyToken = {
-      accessToken: tokenData.accessToken,
-      refreshToken: tokenData.refreshToken,
-      expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000)),
-      shopId: shopId
-    };
+      // Store token data and shop ID in session
+      req.session.etsyToken = {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000)),
+        shopId: shopId
+      };
 
-    // Clean up code verifier
-    delete req.session.etsyCodeVerifier;
-    
-    // Force session save
-    await new Promise((resolve, reject) => {
-      req.session.save(err => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+      // Clean up code verifier
+      delete req.session.etsyCodeVerifier;
+      await req.session.save();
 
-    // Redirect back to original page if set
-    const returnUrl = req.session.etsyAuthReturnUrl || '/my-account';
-    delete req.session.etsyAuthReturnUrl;
-    
-    res.redirect(returnUrl);
+      // Redirect back to original page if set
+      const returnUrl = req.session.etsyAuthReturnUrl || '/my-account';
+      delete req.session.etsyAuthReturnUrl;
+      
+      res.redirect(returnUrl);
+    } catch (shopError) {
+      // If we fail to get shop ID, we should still save the tokens
+      req.session.etsyToken = {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresAt: new Date(Date.now() + (tokenData.expiresIn * 1000))
+      };
+      await req.session.save();
+      
+      throw shopError;
+    }
   } catch (error) {
     console.error('Etsy auth callback error:', error);
     res.status(500).json({

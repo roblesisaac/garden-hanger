@@ -160,7 +160,6 @@ function formatShipmentParcels(shipment) {
 }
 
 function getHeaders() {
-    console.log('isProd()', isProd(), config.SHIP.SHIPPO_TEST);
     const authToken = isProd() ? config.SHIP.SHIPPO_PROD : config.SHIP.SHIPPO_TEST;
 
     return {

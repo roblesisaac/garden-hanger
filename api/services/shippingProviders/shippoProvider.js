@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import config from '../../config/environment';
 import isProd from '../../utils/isProd';
-import config from '../../config/environment';
 import isProd from '../../utils/isProd';
 
 const API_BASE_URL = 'https://api.goshippo.com';

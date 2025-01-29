@@ -156,11 +156,11 @@ export default function orderShippedTemplate(order) {
                           </tr>
                       </thead>
                       <tbody>
-                          ${order.stripeSession.line_items.data.map(item => `
+                          ${order.orderItems.map(item => `
                               <tr>
-                                  <td><a href="${config.URL}/products/${item.description.toLowerCase()}">${item.description}</a></td>
-                                  <td>${item.quantity}</td>
-                                  <td>$${(item.amount_total / 100).toFixed(2)}</td>
+                                  <td><a href="${config.URL}/products/${item.title.toLowerCase()}">${item.title}</a></td>
+                                  <td>${item.qty}</td>
+                                  <td>$${(item.totalPrice / 100).toFixed(2)}</td>
                               </tr>
                           `).join('')}
                       </tbody>

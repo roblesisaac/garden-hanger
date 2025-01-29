@@ -83,6 +83,7 @@ export async function retreiveStripeSession(stripeSessionId) {
 
 export function retreiveStripePublicKey() {
   // return config.STRIPE.PUBLIC_TEST;
+  console.log('isProd()', isProd(), config.STRIPE.PUBLIC_TEST);
   return isProd() ? config.STRIPE.PUBLIC : config.STRIPE.PUBLIC_TEST;
 }
 

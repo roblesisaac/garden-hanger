@@ -185,13 +185,20 @@ export default function useShipping() {
 
         if (itemsInShipment.length === 0) {
             if (items && items.length > 0) {
-                console.warn('formatItemsForShipmentCreation resulted in no items, possibly due to missing product data. Returning default shipping options.');
+                console.warn('formatItemsForShipmentCreation resulted in no items, possibly due to missing product data. Returning default shipping options for manual entry.');
             }
             return {
                 idealOption: {
-                    boxes: [],
-                    items: [],
-                    totalWeight: 0
+                    boxes: [{
+                        length: 12,
+                        width: 12,
+                        height: 12,
+                        boxWeight: 1.1,
+                        items: [],
+                        totalWeight: 1.1,
+                        name: 'Default Box (Manual Entry)',
+                    }],
+                    totalWeight: 1.1
                 },
                 availableOption: {
                     boxes: [],

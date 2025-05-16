@@ -112,7 +112,9 @@
               </button>
             </div>
 
-            <div class="bg-gray-50 p-6 rounded-lg">
+            <div 
+              v-if="shippingOptions && shippingOptions.idealOption && shippingOptions.idealOption.boxes && shippingOptions.idealOption.boxes.length > 0" 
+              class="bg-gray-50 p-6 rounded-lg">
               <h3 class="text-lg font-semibold text-gray-900 mb-4">Ideal Option (Single Box)</h3>
               <div class="grid grid-cols-4 gap-2 mb-2">
                 <div>
@@ -146,6 +148,10 @@
                 class="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300">
                 Fetch Rates For Ideal Option
               </button>
+            </div>
+            <div v-else-if="shippingOptions && shippingOptions.idealOption" class="bg-gray-50 p-6 rounded-lg">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Ideal Option (Single Box)</h3>
+              <p class="text-gray-600">No ideal box could be determined (e.g., due to missing product information or an empty cart).</p>
             </div>
           </template>
         </div>
@@ -258,6 +264,12 @@ function recalculateBoxWeights() {
 }
 
 function recalculateIdealBoxWeight() {
+  if (!shippingOptions.value || 
+      !shippingOptions.value.idealOption || 
+      !shippingOptions.value.idealOption.boxes || 
+      shippingOptions.value.idealOption.boxes.length === 0) {
+    return;
+  }
   const idealBox = shippingOptions.value.idealOption.boxes[0];
   idealBox.totalWeight = idealBox.boxWeight || 1.1;
   idealBox.items.forEach(item => {
@@ -306,10 +318,19 @@ onMounted(async () => {
     isLoading.value = true;
     const shipmentData = await getShippingOptions(props.orderData.orderItems);
     
-    shipmentData.availableOption.boxes.forEach(box => {
-      box.boxWeight = box.boxWeight || 1.1;
-    });
-    shipmentData.idealOption.boxes[0].boxWeight = shipmentData.idealOption.boxes[0].boxWeight || 1.1;
+    // Ensure availableOption.boxes is an array before iterating
+    if (shipmentData.availableOption && Array.isArray(shipmentData.availableOption.boxes)) {
+      shipmentData.availableOption.boxes.forEach(box => {
+        box.boxWeight = box.boxWeight || 1.1;
+      });
+    }
+    
+    // Ensure idealOption.boxes exists and has at least one box before accessing it
+    if (shipmentData.idealOption && shipmentData.idealOption.boxes && shipmentData.idealOption.boxes.length > 0) {
+      if (shipmentData.idealOption.boxes[0]) { // Double check the box itself exists
+        shipmentData.idealOption.boxes[0].boxWeight = shipmentData.idealOption.boxes[0].boxWeight || 1.1;
+      }
+    }
     
     shippingOptions.value = shipmentData;
   } catch (error) {

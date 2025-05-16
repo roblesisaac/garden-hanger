@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@ampt/cli": "^1.1.16",
-    "@ampt/data": "^1.0.26",
-    "@ampt/sdk": "^1.0.19",
+    "@ampt/data": "^1.0.27",
+    "@ampt/sdk": "^1.0.20",
     "@auth0/auth0-vue": "^2.3.3",
     "@stripe/stripe-js": "^4.3.0",
     "@vueuse/head": "^2.0.0",

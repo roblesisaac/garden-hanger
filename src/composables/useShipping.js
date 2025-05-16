@@ -79,11 +79,17 @@ export default function useShipping() {
   
         for (const listing of cartItems) {
             for (const productInListing of listing.productsInListing) {
-                const product = { ...findProduct(productInListing.sku) };
-                const { height, length, weight, width } = product.dimensions;
+                const productFromDb = findProduct(productInListing.sku);
+                
+                if (!productFromDb || !productFromDb.dimensions) {
+                    console.warn(`Product not found or invalid for SKU: ${productInListing.sku} during shipment creation.`);
+                    return []; 
+                }
+                
+                const { height, length, weight, width } = productFromDb.dimensions;
   
                 itemsInShipment.push({
-                    sku: product.sku,
+                    sku: productFromDb.sku,
                     dimensions: {
                         height, length, weight, width
                     },
@@ -176,6 +182,24 @@ export default function useShipping() {
         items = items || useCartStore().items;
 
         const itemsInShipment = formatItemsForShipmentCreation(items);
+
+        if (itemsInShipment.length === 0) {
+            if (items && items.length > 0) {
+                console.warn('formatItemsForShipmentCreation resulted in no items, possibly due to missing product data. Returning default shipping options.');
+            }
+            return {
+                idealOption: {
+                    boxes: [],
+                    items: [],
+                    totalWeight: 0
+                },
+                availableOption: {
+                    boxes: [],
+                    totalWeight: 0
+                }
+            };
+        }
+
         const { dimensions, totalWeight, units } = calculateBoxDimensions(itemsInShipment);
 
         await waitForBoxesDb();

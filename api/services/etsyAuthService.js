@@ -8,8 +8,10 @@ const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
 export class EtsyAuthService {
   constructor() {
-    this.clientId = config.ETSY.API_KEY;
-    this.clientSecret = config.ETSY.SHARED_SECRET;
+    const { clientId, clientSecret } = this.normalizeCredentials(config.ETSY.API_KEY, config.ETSY.SHARED_SECRET);
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.apiKey = this.buildApiKeyHeader();
     this.redirectUri = `${config.baseUrl}/api/etsy/auth/callback`;
     this.scopes = [
       'email_r',
@@ -17,6 +19,45 @@ export class EtsyAuthService {
       'transactions_r',
       'listings_r'
     ];
+  }
+
+  normalizeCredentials(apiKey, sharedSecret) {
+    const key = (apiKey || '').trim();
+    const secret = (sharedSecret || '').trim();
+
+    if (key.includes(':') && !secret) {
+      const [parsedKey, parsedSecret] = key.split(':', 2);
+      return {
+        clientId: (parsedKey || '').trim(),
+        clientSecret: (parsedSecret || '').trim()
+      };
+    }
+
+    return {
+      clientId: key,
+      clientSecret: secret
+    };
+  }
+
+  buildApiKeyHeader() {
+    const key = (this.clientId || '').trim();
+    const secret = (this.clientSecret || '').trim();
+
+    if (!key || !secret) {
+      return '';
+    }
+
+    return `${key}:${secret}`;
+  }
+
+  validateCredentials() {
+    if (!this.clientId) {
+      throw new Error('Etsy API key is missing. Set API_KEY or ETSY_API_KEY.');
+    }
+
+    if (!this.apiKey) {
+      throw new Error('Etsy shared secret is missing. Set SHARED_SECRET or ETSY_SHARED_SECRET.');
+    }
   }
 
   // Generate code verifier for PKCE
@@ -40,6 +81,8 @@ export class EtsyAuthService {
   }
 
   async getAuthUrl() {
+    this.validateCredentials();
+
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
 
@@ -60,6 +103,8 @@ export class EtsyAuthService {
 
   async getAccessToken(code, codeVerifier) {
     try {
+      this.validateCredentials();
+
       const response = await fetch(`${ETSY_AUTH_BASE_TOKEN}/token`, {
         method: 'POST',
         headers: {
@@ -92,6 +137,8 @@ export class EtsyAuthService {
 
   async refreshAccessToken(refreshToken) {
     try {
+      this.validateCredentials();
+
       const response = await fetch(`${ETSY_AUTH_BASE_TOKEN}/token`, {
         method: 'POST',
         headers: {
@@ -121,10 +168,12 @@ export class EtsyAuthService {
 
   async getUserInfo(accessToken) {
     try {
+      this.validateCredentials();
+
       // Get the user ID
       const userResponse = await fetch(`${ETSY_API_BASE}/application/users/me`, {
         headers: {
-          'x-api-key': this.clientId,
+          'x-api-key': this.apiKey,
           'Authorization': `Bearer ${accessToken}`,
           'Accept': 'application/json'
         },
@@ -142,7 +191,7 @@ export class EtsyAuthService {
       try {
         const shopsResponse = await fetch(`${ETSY_API_BASE}/application/users/${userId}/shops`, {
           headers: {
-            'x-api-key': this.clientId,
+            'x-api-key': this.apiKey,
             'Authorization': `Bearer ${accessToken}`,
             'Accept': 'application/json'
           },

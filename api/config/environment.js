@@ -4,6 +4,8 @@ const ENV_NAME = params('ENV_NAME');
 const AMPT_URL = params('AMPT_URL');
 const hostName = AMPT_URL.replace('https://', '');
 const customDomain = params('CUSTOM_DOMAIN') || hostName;
+const etsyApiKey = params('ETSY_API_KEY') || params('API_KEY');
+const etsySharedSecret = params('ETSY_SHARED_SECRET') || params('SHARED_SECRET');
 
 const baseUrl = ENV_NAME === 'prod' ? `https://${customDomain}` : AMPT_URL;
 const domain = ENV_NAME === 'prod' ? '.'+customDomain : '.'+hostName;
@@ -39,8 +41,8 @@ export default {
     domain,
     ENV_NAME,
     ETSY: {
-      API_KEY: params('API_KEY'),
-      SHARED_SECRET: params('SHARED_SECRET'),
+      API_KEY: etsyApiKey ? etsyApiKey.trim() : '',
+      SHARED_SECRET: etsySharedSecret ? etsySharedSecret.trim() : '',
     },
     FRIENDLY_NAME: params('FRIENDLY_NAME'),
     hostName,

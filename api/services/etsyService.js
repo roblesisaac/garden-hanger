@@ -7,13 +7,51 @@ const ETSY_API_BASE = 'https://openapi.etsy.com/v3';
 
 export class EtsyService {
   constructor() {
-    this.apiKey = config.ETSY.API_KEY;
+    const { apiKey, sharedSecret } = this.normalizeCredentials(config.ETSY.API_KEY, config.ETSY.SHARED_SECRET);
+    this.apiKey = this.buildApiKeyHeader(apiKey, sharedSecret);
+  }
+
+  normalizeCredentials(apiKey, sharedSecret) {
+    const key = (apiKey || '').trim();
+    const secret = (sharedSecret || '').trim();
+
+    if (key.includes(':') && !secret) {
+      const [parsedKey, parsedSecret] = key.split(':', 2);
+      return {
+        apiKey: (parsedKey || '').trim(),
+        sharedSecret: (parsedSecret || '').trim()
+      };
+    }
+
+    return {
+      apiKey: key,
+      sharedSecret: secret
+    };
+  }
+
+  buildApiKeyHeader(apiKey, sharedSecret) {
+    const key = (apiKey || '').trim();
+    const secret = (sharedSecret || '').trim();
+
+    if (!key || !secret) {
+      return '';
+    }
+
+    return `${key}:${secret}`;
+  }
+
+  validateCredentials() {
+    if (!this.apiKey) {
+      throw new Error('Etsy credentials are not configured. Set API_KEY+SHARED_SECRET or ETSY_API_KEY+ETSY_SHARED_SECRET.');
+    }
   }
 
   // Authentication and Headers
   async getHeaders(req) {
+    this.validateCredentials();
+
     const accessToken = req.session.etsyToken?.accessToken;
-    
+
     if (!accessToken) {
       throw new Error('No Etsy access token found. Please authenticate first.');
     }
@@ -79,7 +117,7 @@ export class EtsyService {
       const queryParams = this.buildQueryParams(params);
       const orders = await this.fetchOrdersData(req, shopId, queryParams);
       const listings = await listingsModel.findAll({});
-      
+
       const transformedOrders = orders.results.map(order => {
         // Create ISO date string from Etsy timestamp
         const orderDate = new Date(order.created_timestamp * 1000);
@@ -89,7 +127,7 @@ export class EtsyService {
         const hours = String(orderDate.getUTCHours()).padStart(2, '0');
         const minutes = String(orderDate.getUTCMinutes()).padStart(2, '0');
         const seconds = String(orderDate.getUTCSeconds()).padStart(2, '0');
-        
+
         const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
         const random = Math.random().toString(16).slice(2, 14);
 
@@ -110,15 +148,15 @@ export class EtsyService {
           orderItems: order.transactions.map(item => {
             const existingListing = listings.find(listing => listing.etsyLookup.toLowerCase() === item.sku.toLowerCase());
             return {
-                _id: `etsy_${item.transaction_id}`,
-                title: existingListing?.title || item.sku,
-                productsInListing: existingListing ?
-                    existingListing.productsInListing
-                    : [{
-                        sku: item.sku || '',
-                        qty: item.quantity || 1
-                    }],
-                qty: item.quantity || 1
+              _id: `etsy_${item.transaction_id}`,
+              title: existingListing?.title || item.sku,
+              productsInListing: existingListing ?
+                existingListing.productsInListing
+                : [{
+                  sku: item.sku || '',
+                  qty: item.quantity || 1
+                }],
+              qty: item.quantity || 1
             }
           })
         };
